@@ -1,0 +1,9 @@
+{
+    my $RemoteSSHPort = $hotsync{RemoteSSHPort} || '22';
+    my $RemoteHost = $hotsync{RemoteHost} ;
+
+    $OUT .= "REMOTE_SSH_PORT=$RemoteSSHPort\n";
+    $OUT .= "REMOTE_HOST=$RemoteHost\n";
+
+}
+

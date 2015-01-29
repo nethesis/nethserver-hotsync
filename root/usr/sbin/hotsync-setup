@@ -1,0 +1,41 @@
+#!/bin/bash
+#
+# Copyright (C) 2013 Nethesis S.r.l.
+# http://www.nethesis.it - support@nethesis.it
+# 
+# Wed Feb 06 2013 Stefano Fancello <stefano.fancello@nethesis.it>
+#
+
+#read configuration file
+source /etc/hotsync.conf
+
+#check ssh connection to remote host
+/usr/bin/ssh -o PreferredAuthentications=publickey -p ${REMOTE_SSH_PORT} root@${REMOTE_HOST} "exit 76" 2>/dev/null
+if [[ $? == "76" ]] ; then
+	#ssh public/private key properly configured
+	echo "Connection for root@${REMOTE_HOST} correctly configured"
+	exit 0	
+elif [[ $1 == "--check" ]] ; then 
+	#if we whant only to check and we are here, ssh is not properly configured 
+	echo "Connection for root@${REMOTE_HOST} is NOT configured!"
+	exit 0
+fi
+
+#we need a pub/key
+if [[ ! -f /root/.ssh/id_rsa.pub && ! -f /root/.ssh/id_rsa.pub ]] ; then  
+	#key doesn't exists
+	/usr/bin/ssh-keygen -f /root/.ssh/id_rsa -P "" > /dev/null
+fi
+
+if [[ $(grep "$(/bin/cat /root/.ssh/id_rsa.pub)" /root/.ssh/authorized_keys | wc -l) == 0 ]] ; then
+	#key isn't in authorized_keys 
+	/bin/cat /root/.ssh/id_rsa.pub >> /root/.ssh/authorized_keys
+fi
+
+#finally install key on remote machine
+echo "Installing public key on remote system..."
+/usr/bin/ssh-copy-id -i /root/.ssh/id_rsa.pub "root@${REMOTE_HOST}" > /dev/null
+
+#check if all works fine
+$0 --check 
+

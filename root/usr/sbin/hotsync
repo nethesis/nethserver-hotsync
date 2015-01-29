@@ -1,0 +1,97 @@
+#!/bin/bash
+#
+# Copyright (C) 2013 Nethesis S.r.l.
+# http://www.nethesis.it - support@nethesis.it
+# 
+# Wed Feb 06 2013 Stefano Fancello <stefano.fancello@nethesis.it>
+#
+
+#read configuration file
+source /etc/hotsync.conf
+
+#check if hotsync is properly configured:
+if [[ ${REMOTE_SSH_PORT} == '' ]] ; then
+	#this should never happen
+	echo "Remote port is not configured"
+fi
+if [[ ${REMOTE_HOST} == '' ]] ; then
+        echo "Remote host is not configured"
+fi
+
+/usr/bin/ssh -o PreferredAuthentications=publickey -p ${REMOTE_SSH_PORT} root@${REMOTE_HOST} "exit 76" 2>/dev/null
+if [[ $? != "76" ]] ; then
+        echo "Connection for root@${REMOTE_HOST} is not configured properly. Use $0-setup"
+        exit 0
+fi
+
+INCLUDE_FILE=$(mktemp) || exit 1
+EXCLUDE_FILE=$(mktemp) || exit 1
+trap "/bin/rm -f ${INCLUDE_FILE} ${EXCLUDE_FILE};  /sbin/e-smith/signal-event post-backup-config; /sbin/e-smith/signal-event post-backup-data" EXIT SIGINT SIGTERM
+
+#Exclude etc/cron.d/hotsync from sync, because if this file is copied on slave, slave will try to launch
+#hotsync too. 
+echo "etc/cron.d/hotsync" >> ${EXCLUDE_FILE}
+
+#add default backup config files
+for FILE in $(/usr/bin/find /etc/backup-config.d/*.include 2>/dev/null); do
+    cat ${FILE} >> ${INCLUDE_FILE}
+done
+#exclude default backup config files
+for FILE in $(/usr/bin/find /etc/backup-config.d/*.exclude 2>/dev/null); do
+    cat ${FILE} >> ${EXCLUDE_FILE}
+done
+#add default backup data files
+for FILE in $(/usr/bin/find /etc/backup-data.d/*.include 2>/dev/null); do
+    cat ${FILE} >> ${INCLUDE_FILE}
+done
+#exclude default backup data files
+for FILE in $(/usr/bin/find /etc/backup-data.d/*.exclude 2>/dev/null); do
+    cat ${FILE} >> ${EXCLUDE_FILE}
+done
+
+#add user defined include list to rsync file list
+for FILE in $(/usr/bin/find /etc/hotsync.d/*.include 2>/dev/null); do
+    cat ${FILE} >> ${INCLUDE_FILE}
+done
+
+#exclude files from /etc/hotsync.d/*.exclude
+for FILE in $(/usr/bin/find /etc/hotsync.d/*.exclude 2>/dev/null); do
+    cat ${FILE} >> ${EXCLUDE_FILE}
+done
+
+#include files in ${INCLUDE_FILE} if it isn't empty
+if [[ $(/usr/bin/wc -l ${INCLUDE_FILE} | /bin/awk '{print $1}') > 0 ]] ; then 
+	INCLUDEOPT="--files-from=${INCLUDE_FILE}"
+fi
+
+#exclude files in ${EXCLUDE_FILE} if it isn't empty
+if [[ $(/usr/bin/wc -l ${EXCLUDE_FILE} | /bin/awk '{print $1}') > 0 ]] ; then 
+	EXCLUDEOPT="--exclude-from=${EXCLUDE_FILE}"
+fi
+
+for i in $@ ; do
+  if [[ $i == '--dry-run' ]]; then  
+  #If user launc with --dry-run argument, launch a dry-run rsync and exit
+    /usr/bin/rsync -n -P -z -r -a -H -A -e "/usr/bin/ssh -p ${REMOTE_SSH_PORT} -c blowfish" --delete --numeric-ids \
+    ${INCLUDEOPT} ${EXCLUDEOPT} \
+    / "root@${REMOTE_HOST}:/"
+    exit
+  fi
+  if [[ $i == '--list-only' ]]; then 
+  #If user launc with --list-only argument, display file list and exit
+     /usr/bin/rsync -n --list-only -z -r -a -H -A -e "/usr/bin/ssh -p ${REMOTE_SSH_PORT} -c blowfish" --delete --numeric-ids \
+    ${INCLUDEOPT} ${EXCLUDEOPT} \
+    / "root@${REMOTE_HOST}:/"
+    exit
+  fi
+done
+
+/sbin/e-smith/signal-event pre-backup-config
+/sbin/e-smith/signal-event pre-backup-data
+
+#copy files with rsync
+/usr/bin/rsync -z -r -a -H -q -A -e "/usr/bin/ssh -p ${REMOTE_SSH_PORT} -c blowfish" --delete --numeric-ids \
+    ${INCLUDEOPT} ${EXCLUDEOPT} \
+    / "root@${REMOTE_HOST}:/"
+
+
