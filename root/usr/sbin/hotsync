@@ -69,6 +69,9 @@ if [[ $(/usr/bin/wc -l ${EXCLUDE_FILE} | /bin/awk '{print $1}') > 0 ]] ; then
 	EXCLUDEOPT="--exclude-from=${EXCLUDE_FILE}"
 fi
 
+/sbin/e-smith/signal-event pre-backup-config
+/sbin/e-smith/signal-event pre-backup-data
+
 for i in $@ ; do
   if [[ $i == '--dry-run' ]]; then  
   #If user launc with --dry-run argument, launch a dry-run rsync and exit
@@ -85,9 +88,6 @@ for i in $@ ; do
     exit
   fi
 done
-
-/sbin/e-smith/signal-event pre-backup-config
-/sbin/e-smith/signal-event pre-backup-data
 
 #copy files with rsync
 /usr/bin/rsync -z -r -a -H -q -A -e "/usr/bin/ssh -p ${REMOTE_SSH_PORT} -c blowfish" --delete --numeric-ids \
