@@ -69,7 +69,7 @@ if [[ $(/usr/bin/wc -l ${EXCLUDE_FILE} | /bin/awk '{print $1}') > 0 ]] ; then
 	EXCLUDEOPT="--exclude-from=${EXCLUDE_FILE}"
 fi
 
-/sbin/e-smith/signal-event pre-backup-config
+/sbin/e-smith/backup-config
 /sbin/e-smith/signal-event pre-backup-data
 
 for i in $@ ; do
