@@ -1,9 +1,8 @@
-#------------------------------------------------------------
-# DO NOT MODIFY THIS FILE! It is updated automatically by the                                                                                                                   
-# SME Server software. Instead, modify the source template in                                                                                                                   
-# an /etc/e-smith/templates-custom directory. For more                                                                                                                          
-# information, see https://docs.nethesis.it/Template                                                                                                                         
-#                                                                                                                                                                               
-# copyright (C) 2013 Nethesis                                                                                                                            
-#------------------------------------------------------------ 
-0,15,30,45 * * * * root /usr/sbin/hotsync
+{
+    if ( $hotsync{role} eq 'server' ) 
+    {
+        $OUT='0,15,30,45 * * * * root /usr/sbin/hotsync';
+    } else {
+        $OUT="#HotSync disabled in spare server\n#0,15,30,45 * * * * root /usr/sbin/hotsync";
+    }
+} 
