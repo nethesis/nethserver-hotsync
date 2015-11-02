@@ -1,7 +1,7 @@
 Summary: NethServer Enterprise Hotsync 
 Name: nethserver-hotsync
-Version:        @@VERSION@@
-Release:        @@RELEASE@@
+Version:  0.0.8
+Release:  1%{dist}
 License: Firmware
 Group: System Environment/Base
 Source0: %{name}-%{version}.tar.gz
