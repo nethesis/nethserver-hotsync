@@ -1,97 +1,115 @@
 #!/bin/bash
 #
-# Copyright (C) 2013 Nethesis S.r.l.
+# Copyright (C) 2013-2015 Nethesis S.r.l.
 # http://www.nethesis.it - support@nethesis.it
 # 
 # Wed Feb 06 2013 Stefano Fancello <stefano.fancello@nethesis.it>
+# Fri Jun 12 2015 Filippo Carletti <filippo.carletti@nethesis.it>
 #
 
-#read configuration file
-source /etc/hotsync.conf
+# filippo - debug - "strict mode"
+set -euo pipefail
 
-#check if hotsync is properly configured:
-if [[ ${REMOTE_SSH_PORT} == '' ]] ; then
-	#this should never happen
-	echo "Remote port is not configured"
+
+# source configuration file
+[ -f /etc/hotsync.conf ] && source /etc/hotsync.conf
+
+#Use default ssh port if none configured
+if [[ -z ${REMOTE_SSH_PORT} ]] ; then
+    REMOTE_SSH_PORT=22
 fi
-if [[ ${REMOTE_HOST} == '' ]] ; then
-        echo "Remote host is not configured"
+
+if [[ -z "$REMOTE_HOST" ]] ; then
+    echo "Remote host is not configured"
+    exit 1
 fi
+
+#DEBUG
+echo HOST=$REMOTE_HOST
+echo PORT=$REMOTE_SSH_PORT
 
 /usr/bin/ssh -o PreferredAuthentications=publickey -p ${REMOTE_SSH_PORT} root@${REMOTE_HOST} "exit 76" 2>/dev/null
 if [[ $? != "76" ]] ; then
         echo "Connection for root@${REMOTE_HOST} is not configured properly. Use $0-setup"
+
+# lock - code taken from yum-cron
+# if hot sync is scheduled too often, lock prevents concurrent runs
+
+LOCKDIR=/var/lock/hotsync-cron.lock
+LOCKFILE=$LOCKDIR/pidfile
+
+# Try mkdir for the lockfile, will test for and make it in one atomic action
+if mkdir $LOCKDIR 2>/dev/null; then
+  # store the current process ID in there so we can check for staleness later
+  echo "$$" >"${LOCKFILE}"
+  # and clean up locks and tempfile if the script exits or is killed  
+  trap "{ rm -f $LOCKFILE; rmdir $LOCKDIR 2>/dev/null; exit 255; }" INT TERM EXIT
+else
+  # lock failed, check if process exists.  First, if there's no PID file
+  # in the lock directory, something bad has happened, we can't know the
+  # process name, so clean up the old lockdir and restart
+  if [ ! -f $LOCKFILE ]; then
+    rmdir $LOCKDIR 2>/dev/null
+    echo "hotsync-cron: no lock PID, clearing and restarting myself" >&2
+    exec $0 "$@"
+  fi
+  OTHERPID="$(cat "${LOCKFILE}")"
+  # if cat wasn't able to read the file anymore, another instance probably is
+  # about to remove the lock -- exit, we're *still* locked
+    if [ $? != 0 ]; then
+      echo "hotsync-cron: lock failed, PID ${OTHERPID} is active" >&2
+      exit 0
+    fi
+    if ! kill -0 $OTHERPID &>/dev/null; then
+      # lock is stale, remove it and restart
+      echo "hotsync-cron: removing stale lock of nonexistant PID ${OTHERPID}" >&2
+      rm -rf "${LOCKDIR}"
+      echo "hotsync-cron: restarting myself" >&2
+      exec $0 "$@"
+    else
+      # Remove stale (more than two hours old) lockfiles
+      find $LOCKDIR -type f -name 'pidfile' -amin +120 -exec rm -rf $LOCKDIR \;
+      # if it's still there, it wasn't too old, bail
+      if [ -f $LOCKFILE ]; then
+        # lock is valid and OTHERPID is active - exit, we're locked!
+        echo "hotsync-cron: lock failed, PID ${OTHERPID} is active" >&2
         exit 0
+      else
+        # lock was invalid, restart
+	echo "hotsync-cron: removing stale lock belonging to stale PID ${OTHERPID}" >&2
+        echo "hotsync-cron: restarting myself" >&2
+        exec $0 "$@"
+      fi
+    fi
 fi
 
-INCLUDE_FILE=$(mktemp) || exit 1
-EXCLUDE_FILE=$(mktemp) || exit 1
-trap "/bin/rm -f ${INCLUDE_FILE} ${EXCLUDE_FILE};  /sbin/e-smith/signal-event post-backup-config; /sbin/e-smith/signal-event post-backup-data" EXIT SIGINT SIGTERM
 
-#Exclude etc/cron.d/hotsync from sync, because if this file is copied on slave, slave will try to launch
-#hotsync too. 
-echo "etc/cron.d/hotsync" >> ${EXCLUDE_FILE}
+#DEBUG - use a non random include file
+#INCLUDE_FILE=$(mktemp) || exit 1
+INCLUDE_FILE=inc
+
+#TODO - trap
+#trap "/bin/rm -f ${INCLUDE_FILE}; /sbin/e-smith/signal-event post-backup-config; /sbin/e-smith/signal-event post-backup-data" EXIT SIGINT SIGTERM
+#trap "/bin/rm -f ${INCLUDE_FILE} ${EXCLUDE_FILE}" EXIT SIGINT SIGTERM
 
 #add default backup config files
-for FILE in $(/usr/bin/find /etc/backup-config.d/*.include 2>/dev/null); do
-    cat ${FILE} >> ${INCLUDE_FILE}
-done
-#exclude default backup config files
-for FILE in $(/usr/bin/find /etc/backup-config.d/*.exclude 2>/dev/null); do
-    cat ${FILE} >> ${EXCLUDE_FILE}
-done
+cat /etc/backup-config.d/*.include > ${INCLUDE_FILE}
 #add default backup data files
-for FILE in $(/usr/bin/find /etc/backup-data.d/*.include 2>/dev/null); do
-    cat ${FILE} >> ${INCLUDE_FILE}
-done
-#exclude default backup data files
-for FILE in $(/usr/bin/find /etc/backup-data.d/*.exclude 2>/dev/null); do
-    cat ${FILE} >> ${EXCLUDE_FILE}
-done
+cat /etc/backup-data.d/*.include >> ${INCLUDE_FILE}
 
-#add user defined include list to rsync file list
-for FILE in $(/usr/bin/find /etc/hotsync.d/*.include 2>/dev/null); do
-    cat ${FILE} >> ${INCLUDE_FILE}
-done
 
-#exclude files from /etc/hotsync.d/*.exclude
-for FILE in $(/usr/bin/find /etc/hotsync.d/*.exclude 2>/dev/null); do
-    cat ${FILE} >> ${EXCLUDE_FILE}
-done
-
-#include files in ${INCLUDE_FILE} if it isn't empty
-if [[ $(/usr/bin/wc -l ${INCLUDE_FILE} | /bin/awk '{print $1}') > 0 ]] ; then 
-	INCLUDEOPT="--files-from=${INCLUDE_FILE}"
+XTRA_OPTS=""
+if [ "${1:-unset}" == '--dry-run' ]; then
+    XTRA_OPTS="--dry-run -v"
 fi
-
-#exclude files in ${EXCLUDE_FILE} if it isn't empty
-if [[ $(/usr/bin/wc -l ${EXCLUDE_FILE} | /bin/awk '{print $1}') > 0 ]] ; then 
-	EXCLUDEOPT="--exclude-from=${EXCLUDE_FILE}"
-fi
-
-/sbin/e-smith/backup-config
-/sbin/e-smith/signal-event pre-backup-data
-
-for i in $@ ; do
-  if [[ $i == '--dry-run' ]]; then  
-  #If user launc with --dry-run argument, launch a dry-run rsync and exit
-    /usr/bin/rsync -n -P -z -r -a -H -A -e "/usr/bin/ssh -p ${REMOTE_SSH_PORT} -c blowfish" --delete --numeric-ids \
-    ${INCLUDEOPT} ${EXCLUDEOPT} \
-    / "root@${REMOTE_HOST}:/"
-    exit
-  fi
-  if [[ $i == '--list-only' ]]; then 
-  #If user launc with --list-only argument, display file list and exit
-     /usr/bin/rsync -n --list-only -z -r -a -H -A -e "/usr/bin/ssh -p ${REMOTE_SSH_PORT} -c blowfish" --delete --numeric-ids \
-    ${INCLUDEOPT} ${EXCLUDEOPT} \
-    / "root@${REMOTE_HOST}:/"
-    exit
-  fi
-done
 
 #copy files with rsync
-/usr/bin/rsync -z -r -a -H -q -A -e "/usr/bin/ssh -p ${REMOTE_SSH_PORT} -c blowfish" --delete --numeric-ids \
-    ${INCLUDEOPT} ${EXCLUDEOPT} \
+# -q
+#    --files-from=${INCLUDE_FILE} --exclude=.ssh/authorized_keys \
+/usr/bin/rsync ${XTRA_OPTS} -z -r -a -H -A -e "/usr/bin/ssh -p ${REMOTE_SSH_PORT} -c blowfish -o StrictHostKeyChecking=no" --delete --numeric-ids \
+    --files-from=${INCLUDE_FILE} \
+    --exclude=/var/lib/nethserver/backup/ \
     / "root@${REMOTE_HOST}:/"
 
+exit 0
 

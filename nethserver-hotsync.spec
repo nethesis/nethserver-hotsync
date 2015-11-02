@@ -7,7 +7,7 @@ Group: System Environment/Base
 Source0: %{name}-%{version}.tar.gz
 Packager: Stefano Fancello <stefano.fancello@nethesis.it>
 BuildArch: noarch
-Requires: nethserver-base nethserver-backup-config nethserver-backup-data
+Requires: nethserver-base nethserver-backup-config nethserver-backup-data rsync
 BuildRequires: nethserver-devtools
 AutoReq: no
 
