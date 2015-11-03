@@ -7,10 +7,6 @@
 # Fri Jun 12 2015 Filippo Carletti <filippo.carletti@nethesis.it>
 #
 
-# filippo - debug - "strict mode"
-set -euo pipefail
-
-
 # source configuration file
 [ -f /etc/hotsync.conf ] && source /etc/hotsync.conf
 
@@ -24,20 +20,17 @@ if [[ -z "$REMOTE_HOST" ]] ; then
     exit 1
 fi
 
-#DEBUG
-echo HOST=$REMOTE_HOST
-echo PORT=$REMOTE_SSH_PORT
-
-/usr/bin/ssh -o PreferredAuthentications=publickey -p ${REMOTE_SSH_PORT} root@${REMOTE_HOST} "exit 76" 2>/dev/null
+/usr/bin/ssh -o "ConnectTimeout=10" -o "PreferredAuthentications=publickey" -p ${REMOTE_SSH_PORT} root@${REMOTE_HOST} "exit 76" 2>/dev/null
 if [[ $? != "76" ]] ; then
-        echo "Connection for root@${REMOTE_HOST} is not configured properly. Use $0-setup"
+    echo "Connection for root@${REMOTE_HOST} is not configured properly. Use hotsync-setup"
+    exit 1
+fi
 
 # lock - code taken from yum-cron
 # if hot sync is scheduled too often, lock prevents concurrent runs
 
 LOCKDIR=/var/lock/hotsync-cron.lock
 LOCKFILE=$LOCKDIR/pidfile
-
 # Try mkdir for the lockfile, will test for and make it in one atomic action
 if mkdir $LOCKDIR 2>/dev/null; then
   # store the current process ID in there so we can check for staleness later
@@ -84,15 +77,11 @@ else
 fi
 
 
-#DEBUG - use a non random include file
-#INCLUDE_FILE=$(mktemp) || exit 1
-#EXCLUDE_FILE=$(mktemp) || exit 1
-INCLUDE_FILE=include
-EXCLUDE_FILE=exclude
+INCLUDE_FILE=$(mktemp) || exit 1
+EXCLUDE_FILE=$(mktemp) || exit 1
 
-#TODO - trap
-#trap "/bin/rm -f ${INCLUDE_FILE}; /sbin/e-smith/signal-event post-backup-config; /sbin/e-smith/signal-event post-backup-data" EXIT SIGINT SIGTERM
-#trap "/bin/rm -f ${INCLUDE_FILE} ${EXCLUDE_FILE}" EXIT SIGINT SIGTERM
+#trap
+trap "{ rm -f $LOCKFILE; rmdir $LOCKDIR 2>/dev/null; /bin/rm -f ${INCLUDE_FILE} ${EXCLUDE_FILE}; }" INT TERM EXIT
 
 #add default backup config files
 #[ -d /etc/backup-config.d ] && cat /etc/backup-config.d/*.include > ${INCLUDE_FILE}
@@ -114,14 +103,8 @@ fi
 #copy files with rsync
 # -q
 #    --files-from=${INCLUDE_FILE} --exclude=.ssh/authorized_keys \
-/usr/bin/rsync ${XTRA_OPTS} -z -r -a -H -A -e "/usr/bin/ssh -p ${REMOTE_SSH_PORT} -c blowfish -o StrictHostKeyChecking=no" --delete --numeric-ids \
+/usr/bin/rsync ${XTRA_OPTS} -z -r -a -H -A -e "/usr/bin/ssh -p ${REMOTE_SSH_PORT} -c blowfish -o PreferredAuthentications=publickey" --delete --numeric-ids \
     --files-from=${INCLUDE_FILE} \
     --exclude-from=${EXCLUDE_FILE} \
     / "root@${REMOTE_HOST}:/"
-
-exit 0
-
-
-
-
 
