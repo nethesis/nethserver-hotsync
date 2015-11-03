@@ -86,17 +86,25 @@ fi
 
 #DEBUG - use a non random include file
 #INCLUDE_FILE=$(mktemp) || exit 1
-INCLUDE_FILE=inc
+#EXCLUDE_FILE=$(mktemp) || exit 1
+INCLUDE_FILE=include
+EXCLUDE_FILE=exclude
 
 #TODO - trap
 #trap "/bin/rm -f ${INCLUDE_FILE}; /sbin/e-smith/signal-event post-backup-config; /sbin/e-smith/signal-event post-backup-data" EXIT SIGINT SIGTERM
 #trap "/bin/rm -f ${INCLUDE_FILE} ${EXCLUDE_FILE}" EXIT SIGINT SIGTERM
 
 #add default backup config files
-cat /etc/backup-config.d/*.include > ${INCLUDE_FILE}
-#add default backup data files
-cat /etc/backup-data.d/*.include >> ${INCLUDE_FILE}
+#[ -d /etc/backup-config.d ] && cat /etc/backup-config.d/*.include > ${INCLUDE_FILE}
 
+#add default backup data files
+[ -d /etc/backup-data.d ] && (cat /etc/backup-data.d/*.include >> ${INCLUDE_FILE} ;  cat /etc/backup-data.d/*.exclude >> ${EXCLUDE_FILE})
+
+#exclude backup directory 
+echo "/var/lib/nethserver/backup/" >> ${EXCLUDE_FILE}
+
+#copy backup config file
+echo "/var/lib/nethserver/backup/backup-config.tar.xz" >> ${INCLUDE_FILE}
 
 XTRA_OPTS=""
 if [ "${1:-unset}" == '--dry-run' ]; then
@@ -108,8 +116,12 @@ fi
 #    --files-from=${INCLUDE_FILE} --exclude=.ssh/authorized_keys \
 /usr/bin/rsync ${XTRA_OPTS} -z -r -a -H -A -e "/usr/bin/ssh -p ${REMOTE_SSH_PORT} -c blowfish -o StrictHostKeyChecking=no" --delete --numeric-ids \
     --files-from=${INCLUDE_FILE} \
-    --exclude=/var/lib/nethserver/backup/ \
+    --exclude-from=${EXCLUDE_FILE} \
     / "root@${REMOTE_HOST}:/"
 
 exit 0
+
+
+
+
 
