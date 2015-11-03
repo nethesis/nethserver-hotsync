@@ -48,6 +48,11 @@ if [[ $? != "76" ]] ; then
     #install key on remote machine. Don't use ssh-copy-id here because it doesn't support custom port
     echo "trying to copy ${REMOTE_HOST}:/root/.ssh/authorized_keys. Insert ${REMOTE_HOST} root password when requested."
     /usr/bin/ssh -o "ConnectTimeout=10" -p ${REMOTE_SSH_PORT} root@${REMOTE_HOST} 'if [[ ! -d /root/.ssh ]] ; then mkdir -p /root/.ssh; chmod 700 /root/.ssh ; fi ; if [[ ! -f /root/.ssh/authorized_keys ]] ; then touch /root/.ssh/authorized_keys; chmod 600 /root/.ssh/authorized_keys ; fi ;  cat >> /root/.ssh/authorized_keys' < /root/.ssh/id_rsa.pub
+
+    #also copy pub key in local authorized key
+    if [[ ! -d /root/.ssh ]] ; then mkdir -p /root/.ssh; chmod 700 /root/.ssh ; fi ; if [[ ! -f /root/.ssh/authorized_keys ]] ; then touch /root/.ssh/authorized_keys; chmod 600 /root/.ssh/authorized_keys ; fi ;  cat >> /root/.ssh/authorized_keys < /root/.ssh/id_rsa.pub   
+ 
+    #check
     /usr/bin/ssh -o "ConnectTimeout=10" -o "PreferredAuthentications=publickey"  -p ${REMOTE_SSH_PORT} root@${REMOTE_HOST} "exit 76" 2>/dev/null
     if [[ $? == "76" ]] ; then
         echo "Success!" 
