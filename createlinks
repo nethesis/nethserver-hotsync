@@ -28,6 +28,7 @@ use File::Path;
 
 $event = "nethserver-hotsync-update";
 event_actions($event, 'initialize-default-databases' => '00');
+event_actions($event, 'backup-config-execute' => '90');
 event_templates($event, qw(
                 /etc/cron.d/hotsync
                 /etc/hotsync.conf
