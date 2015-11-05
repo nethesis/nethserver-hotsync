@@ -120,6 +120,9 @@ if [ "${1:-unset}" == '--dry-run' ]; then
     XTRA_OPTS="--dry-run -v"
 fi
 
+#launch backup before rsync
+/sbin/e-smith/backup-config
+
 #copy files with rsync
 # -q
 #    --files-from=${INCLUDE_FILE} --exclude=.ssh/authorized_keys \
