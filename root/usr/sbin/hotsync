@@ -16,13 +16,13 @@ if [[ -z ${REMOTE_SSH_PORT} ]] ; then
 fi
 
 if [[ -z "$REMOTE_HOST" ]] ; then
-    echo "Remote host is not configured"
+    echo "ERROR: remote host is not configured" >&2  
     exit 1
 fi
 
 /usr/bin/ssh -o "ConnectTimeout=10" -o "PreferredAuthentications=publickey" -p ${REMOTE_SSH_PORT} root@${REMOTE_HOST} "exit 76" 2>/dev/null
 if [[ $? != "76" ]] ; then
-    echo "Connection for root@${REMOTE_HOST} is not configured properly. Use hotsync-setup"
+    echo "ERROR: connection for root@${REMOTE_HOST} is not configured properly. Use hotsync-setup" >&2
     exit 1
 fi
 
