@@ -96,7 +96,7 @@ echo "/var/lib/nethserver/backup/" >> ${EXCLUDE_FILE}
 echo "/var/lib/nethserver/backup/backup-config.tar.xz" >> ${INCLUDE_FILE}
 
 ##################mysql hotsync###################
-if [[ $(/sbin/e-smith/config getprop hotsync mysql) != 'disabled' ]]; then
+if [[ $MYSQL != 'disabled' ]]; then
   if $(rpm -q --quiet nethserver-mysql ); then 
     MYSQLTMP="/var/lib/nethserver/hotsync/mysql"
     /usr/bin/mysqlhotcopy -q -u 'root' -p "$(cat /etc/my.pwd)" --addtodest \
