@@ -92,6 +92,9 @@ trap "{ rm -f $LOCKFILE; rmdir $LOCKDIR 2>/dev/null; /bin/rm -f ${INCLUDE_FILE} 
 #exclude backup directory 
 echo "/var/lib/nethserver/backup/" >> ${EXCLUDE_FILE}
 
+#exclude nethserver db dir
+echo "/var/lib/nethserver/db/" >> ${EXCLUDE_FILE}
+
 #copy backup config file
 echo "/var/lib/nethserver/backup/backup-config.tar.xz" >> ${INCLUDE_FILE}
 
