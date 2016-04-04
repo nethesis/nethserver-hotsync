@@ -98,6 +98,10 @@ echo "/var/lib/nethserver/db/" >> ${EXCLUDE_FILE}
 #copy backup config file
 echo "/var/lib/nethserver/backup/backup-config.tar.xz" >> ${INCLUDE_FILE}
 
+#copy passwd and group file 
+echo "/etc/passwd" >> ${INCLUDE_FILE}
+echo "/etc/group" >> ${INCLUDE_FILE}
+
 ##################mysql hotsync###################
 if [[ $MYSQL != 'disabled' ]]; then
   if $(rpm -q --quiet nethserver-mysql ); then 
