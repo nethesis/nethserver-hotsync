@@ -1,8 +1,8 @@
 {
     if ( $hotsync{role} ne 'spare' && $hotsync{RemoteHost} ne '') 
     {
-        $OUT='0,15,30,45 * * * * root /usr/sbin/hotsync > /dev/null';
+        $OUT='#HotSync Master\n0,15,30,45 * * * * root /usr/sbin/hotsync > /dev/null';
     } else {
-        $OUT="#HotSync disabled in spare server\n#0,15,30,45 * * * * root /usr/sbin/hotsync > /dev/null";
+        $OUT='#HotSync Spare\n0 1 * * * root /usr/sbin/hotsync-spare-packages > /dev/null';
     }
 } 

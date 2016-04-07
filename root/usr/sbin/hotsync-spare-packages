@@ -1,0 +1,8 @@
+#!/bin/bash
+#Install on spare server same packages installed on master
+#
+#Extract package file list
+/bin/tar -xf /var/lib/nethserver/backup/backup-config.tar.xz -C / var/lib/nethserver/backup/package-list
+
+#launch reinstall action
+/etc/e-smith/events/actions/nethserver-backup-config-reinstall

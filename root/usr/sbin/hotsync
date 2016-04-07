@@ -102,6 +102,13 @@ echo "/var/lib/nethserver/backup/backup-config.tar.xz" >> ${INCLUDE_FILE}
 echo "/etc/passwd" >> ${INCLUDE_FILE}
 echo "/etc/group" >> ${INCLUDE_FILE}
 
+#copy yum configuration
+cat >> ${INCLUDE_FILE} << EOF
+/etc/yum/vars/serverid
+/etc/yum.repos.d/
+/etc/yum.conf
+EOF
+
 ##################mysql hotsync###################
 if [[ $MYSQL != 'disabled' ]]; then
   if $(rpm -q --quiet nethserver-mysql ); then 

@@ -69,7 +69,7 @@ echo -n "Configuring spare..."
 	if [[ $? != 0 ]]; then 
 	    yum install -y nethserver-hotsync
 	fi
-        /sbin/e-smith/config setprop hotsync role spare && /etc/e-smith/events/actions/nethserver-hotsync-conf-spare"
+        /sbin/e-smith/config setprop hotsync role spare && /etc/e-smith/events/actions/nethserver-hotsync-conf"
 if [[ $? != 0 ]] ; then 
     echo "FAIL"
     exit 1
