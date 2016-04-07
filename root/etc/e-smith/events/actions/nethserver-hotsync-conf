@@ -4,7 +4,7 @@ use esmith::ConfigDB;
 
 my $conf = esmith::ConfigDB->open || die("Could not open config db\n");
 my $hotsync = $conf->get('hotsync') || die("there's no hotsync key\n");
-my $role = $hotsync->prop('role')  || $role = "";
+my $role = $hotsync->prop('role')  || "";
 my $backup = $conf->get('backup-config');
 my $BackupStatus = $backup->prop('status') || '';
 
