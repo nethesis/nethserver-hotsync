@@ -1,8 +1,14 @@
 {
-    if ( $hotsync{role} ne 'spare' && $hotsync{RemoteHost} ne '') 
+    if ( $hotsync{role} eq 'master' && $hotsync{RemoteHost} eq '')
     {
-        $OUT='#HotSync Master\n0,15,30,45 * * * * root /usr/sbin/hotsync > /dev/null';
+        die "Role is master but no remote host is configured!";
+    }
+    if ( $hotsync{role} eq 'master') 
+    {
+        $OUT="#HotSync Master\n0,15,30,45 * * * * root /usr/sbin/hotsync > /dev/null";
+    } elsif ( $hotsync{role} eq 'spare') {
+        $OUT="#HotSync Spare\n0 1 * * * root /usr/sbin/hotsync-spare-packages > /dev/null";
     } else {
-        $OUT='#HotSync Spare\n0 1 * * * root /usr/sbin/hotsync-spare-packages > /dev/null';
+        die "Unknow role";
     }
 } 
