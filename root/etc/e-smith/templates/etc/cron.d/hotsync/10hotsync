@@ -1,9 +1,9 @@
 {
-    if ( $hotsync{role} eq 'master' && $hotsync{RemoteHost} eq '')
+    if ( ( $hotsync{role} eq 'master' || $hotsync{role} eq 'server') && $hotsync{RemoteHost} eq '')
     {
         die "Role is master but no remote host is configured!";
     }
-    if ( $hotsync{role} eq 'master') 
+    if ( $hotsync{role} eq 'master' || $hotsync{role} eq 'server') 
     {
         $OUT="#HotSync Master\n0,15,30,45 * * * * root /usr/sbin/hotsync > /dev/null";
     } elsif ( $hotsync{role} eq 'spare') {

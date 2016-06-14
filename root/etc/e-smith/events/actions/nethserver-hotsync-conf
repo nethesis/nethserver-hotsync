@@ -16,7 +16,7 @@ if ($role eq 'spare') {
   if ($BackupStatus eq 'enabled'){
     $backup->set_prop('status','disabled');
   }
-} elsif ($role eq 'master') {
+} elsif ($role eq 'master' || $role eq 'server') {
   #configuring master
   #enable yum nethserver plugin
   system("sed","-i", 's/enabled = 0/enabled = 1/g',"/etc/yum/pluginconf.d/nethserver_events.conf");

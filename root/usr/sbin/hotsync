@@ -109,6 +109,9 @@ cat >> ${INCLUDE_FILE} << EOF
 /etc/yum.conf
 EOF
 
+#copy mysql password file
+echo "/etc/my.pwd" >> ${INCLUDE_FILE}
+
 ##################mysql hotsync###################
 if [[ $MYSQL != 'disabled' ]]; then
   if $(rpm -q --quiet nethserver-mysql ); then 
