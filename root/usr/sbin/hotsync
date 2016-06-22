@@ -81,7 +81,7 @@ INCLUDE_FILE=$(mktemp) || (echo "ERROR! fail creating temporary file" >&2 ; exit
 EXCLUDE_FILE=$(mktemp) || (echo "ERROR! fail creating temporary mysql directory"  >&2 ; exit 1)
 
 #trap
-trap "{ rm -f $LOCKFILE; rmdir $LOCKDIR 2>/dev/null; /bin/rm -f ${INCLUDE_FILE} ${EXCLUDE_FILE}; }" INT TERM EXIT
+trap "{ rm -f $LOCKFILE; rmdir $LOCKDIR 2>/dev/null; /bin/rm -f ${INCLUDE_FILE} ${EXCLUDE_FILE}; /etc/e-smith/events/actions/mysql-delete-dumped-tables; }" INT TERM EXIT
 
 #add default backup config files
 #[ -d /etc/backup-config.d ] && cat /etc/backup-config.d/*.include > ${INCLUDE_FILE}
@@ -91,6 +91,9 @@ trap "{ rm -f $LOCKFILE; rmdir $LOCKDIR 2>/dev/null; /bin/rm -f ${INCLUDE_FILE} 
 
 #exclude backup directory 
 echo "/var/lib/nethserver/backup/" >> ${EXCLUDE_FILE}
+
+#include mysql backup
+echo "/var/lib/nethserver/backup/mysql/" >> ${INCLUDE_FILE}
 
 #exclude nethserver db dir
 echo "/var/lib/nethserver/db/" >> ${EXCLUDE_FILE}
@@ -115,21 +118,9 @@ echo "/etc/my.pwd" >> ${INCLUDE_FILE}
 ##################mysql hotsync###################
 if [[ $MYSQL != 'disabled' ]]; then
   if $(rpm -q --quiet nethserver-mysql ); then 
-    MYSQLTMP="/var/lib/nethserver/hotsync/mysql"
-    /usr/bin/mysqlhotcopy -q -u 'root' -p "$(cat /etc/my.pwd)" --addtodest \
-        $(echo -n $(/usr/bin/mysql --defaults-file=/root/.my.cnf -n -B -e "SHOW DATABASES" | grep -v '^Database$\|^information_schema$')) \
-        $MYSQLTMP
-
-    #This folder has a special rsync
-    echo $MYSQLTMP >> ${EXCLUDE_FILE}
-
-    /usr/bin/rsync ${XTRA_OPTS} -z -r -a -H -A -e "/usr/bin/ssh -p ${REMOTE_SSH_PORT} -c blowfish -o PreferredAuthentications=publickey" --delete --numeric-ids \
-        /var/lib/nethserver/hotsync/mysql/* \
-        "root@${REMOTE_HOST}:/var/lib/mysql/"
+    /etc/e-smith/events/actions/mysql-dump-tables
   fi
 fi
-
-#TODO remove mysql files? 
 ###################################################
 
 XTRA_OPTS=""

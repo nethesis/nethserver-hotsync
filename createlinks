@@ -36,3 +36,4 @@ event_templates($event, qw(
 ));
 
 event_actions('post-restore-config', 'nethserver-hotsync-conf' => '40');
+event_actions('post-restore-config', 'nethserver-hotsync-load-mysql-tables' => '80');
