@@ -1,7 +1,7 @@
 Summary: NethServer Enterprise Hotsync 
 Name: nethserver-hotsync
-Version:  0.1.0
-Release:  1%{dist}
+Version: 1.0.0
+Release: 1%{?dist}
 License: Firmware
 Group: System Environment/Base
 Source0: %{name}-%{version}.tar.gz
@@ -34,3 +34,6 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root)
 
 %changelog
+* Fri Jul 15 2016 Stefano Fancello <stefano.fancello@nethesis.it> - 1.0.0-1
+- First package
+
