@@ -5,7 +5,12 @@
     }
     if ( $hotsync{role} eq 'master' || $hotsync{role} eq 'server') 
     {
-        $OUT="#HotSync Master\n0,15,30,45 * * * * root /usr/sbin/hotsync > /dev/null";
+        if ( $hotsync{status} eq 'enabled' )
+        {
+            $OUT="#HotSync Master\n0,15,30,45 * * * * root /usr/sbin/hotsync > /dev/null";
+        } else {
+            $OUT="#HotSync Master - status disabled";
+        }
     } elsif ( $hotsync{role} eq 'spare') {
         $OUT="#HotSync Spare\n0 1 * * * root /usr/sbin/hotsync-spare-packages > /dev/null";
     } else {
