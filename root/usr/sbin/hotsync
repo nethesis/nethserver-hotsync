@@ -137,5 +137,13 @@ fi
 /usr/bin/rsync ${XTRA_OPTS} -z -r -a -H -A -e "/usr/bin/ssh -p ${REMOTE_SSH_PORT} -c blowfish -o PreferredAuthentications=publickey" --delete --numeric-ids \
     --files-from=${INCLUDE_FILE} \
     --exclude-from=${EXCLUDE_FILE} \
-    / "root@${REMOTE_HOST}:/"
+    / "root@${REMOTE_HOST}:/" 2>/tmp/hotsync.log
 
+RC=$?
+
+if ! { [ $RC -eq 24 ] || [ $RC -eq 0 ] ;} ; then
+  (>&2 echo "hotsync error: rsync returned $RC. rsync output:")
+  (>&2 cat /tmp/hotsync.log)
+fi
+
+rm -f /tmp/hotsync.log
