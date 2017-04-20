@@ -77,11 +77,11 @@ else
 fi
 
 
-INCLUDE_FILE=$(mktemp) || (echo "ERROR! fail creating temporary file" >&2 ; exit 1)
-EXCLUDE_FILE=$(mktemp) || (echo "ERROR! fail creating temporary mysql directory"  >&2 ; exit 1)
+INCLUDE_FILE=$(mktemp) || (echo "ERROR! fail creating temporary include file" >&2 ; exit 1)
+EXCLUDE_FILE=$(mktemp) || (echo "ERROR! fail creating temporary exclude file"  >&2 ; exit 1)
 
 #trap
-trap "{ rm -f $LOCKFILE; rmdir $LOCKDIR 2>/dev/null; /bin/rm -f ${INCLUDE_FILE} ${EXCLUDE_FILE}; /etc/e-smith/events/actions/mysql-delete-dumped-tables; }" INT TERM EXIT
+trap "{ rm -f $LOCKFILE; rmdir $LOCKDIR 2>/dev/null; /bin/rm -f ${INCLUDE_FILE} ${EXCLUDE_FILE}; }" INT TERM EXIT
 
 #add default backup config files
 #[ -d /etc/backup-config.d ] && cat /etc/backup-config.d/*.include > ${INCLUDE_FILE}
