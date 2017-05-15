@@ -141,7 +141,7 @@ fi
 
 RC=$?
 
-if ! { [ $RC -eq 24 ] || [ $RC -eq 0 ] ;} ; then
+if ! { [ $RC -eq 23 ] || [ $RC -eq 24 ] || [ $RC -eq 0 ] ;} ; then
   (>&2 echo "hotsync error: rsync returned $RC. rsync output:")
   (>&2 cat /tmp/hotsync.log)
 fi
