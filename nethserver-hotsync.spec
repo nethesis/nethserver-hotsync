@@ -25,7 +25,8 @@ perl createlinks
 rm -rf $RPM_BUILD_ROOT
 (cd root ; find . -depth -print | cpio -dump $RPM_BUILD_ROOT)
 rm -f %{name}-%{version}-%{release}-filelist
-/sbin/e-smith/genfilelist $RPM_BUILD_ROOT > %{name}-%{version}-%{release}-filelist
+%{genfilelist} $RPM_BUILD_ROOT > %{name}-%{version}-%{release}-filelist
+
 
 %clean
 rm -rf $RPM_BUILD_ROOT

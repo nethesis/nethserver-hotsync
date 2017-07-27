@@ -117,7 +117,7 @@ echo "/etc/my.pwd" >> ${INCLUDE_FILE}
 
 ##################mysql hotsync###################
 if [[ $MYSQL != 'disabled' ]]; then
-  if $(rpm -q --quiet nethserver-mysql ); then 
+  if rpm -q --quiet nethserver-mysql; then
     /etc/e-smith/events/actions/mysql-dump-tables
   fi
 fi
