@@ -9,7 +9,6 @@ Packager: Stefano Fancello <stefano.fancello@nethesis.it>
 BuildArch: noarch
 Requires: nethserver-base nethserver-backup-config rsync
 BuildRequires: nethserver-devtools
-AutoReq: no
 
 %description
 NethServer Hotsync is a tool that simplifies configuration of rsync to keep two NethServer up to date
@@ -22,17 +21,18 @@ NethServer Hotsync is a tool that simplifies configuration of rsync to keep two 
 perl createlinks
 
 %install
-rm -rf $RPM_BUILD_ROOT
-(cd root ; find . -depth -print | cpio -dump $RPM_BUILD_ROOT)
+rm -rf %{buildroot}
+(cd root ; find . -depth -print | cpio -dump %{buildroot})
 rm -f %{name}-%{version}-%{release}-filelist
-%{genfilelist} $RPM_BUILD_ROOT > %{name}-%{version}-%{release}-filelist
+%{genfilelist} %{buildroot} > %{name}-%{version}-%{release}-filelist
 
 
 %clean
-rm -rf $RPM_BUILD_ROOT
+rm -rf %{buildroot}
 
 %files -f %{name}-%{version}-%{release}-filelist
 %defattr(-,root,root)
+%dir %{_nseventsdir}/%{name}-update
 
 %changelog
 * Fri Jul 15 2016 Stefano Fancello <stefano.fancello@nethesis.it> - 1.0.0-1
