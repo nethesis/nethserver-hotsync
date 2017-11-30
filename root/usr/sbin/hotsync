@@ -83,8 +83,12 @@ EXCLUDE_FILE=$(mktemp) || (echo "ERROR! fail creating temporary exclude file"  >
 #trap
 trap "{ rm -f $LOCKFILE; rmdir $LOCKDIR 2>/dev/null; /bin/rm -f ${INCLUDE_FILE} ${EXCLUDE_FILE}; }" INT TERM EXIT
 
-#add default backup config files
-#[ -d /etc/backup-config.d ] && cat /etc/backup-config.d/*.include > ${INCLUDE_FILE}
+#execute custom script. Every executable in /etc/hotsync.d is executed. INCLUDE_FILE and EXCLUDE_FILE are passed as arguments.
+if [[ -d /etc/hotsync.d ]]; then
+    for SCRIPT in $(/usr/bin/find /etc/hotsync.d -type f -executable); do
+        ${SCRIPT} ${INCLUDE_FILE} ${EXCLUDE_FILE}
+    done
+fi
 
 #add default backup data files
 [ -d /etc/backup-data.d ] && (cat /etc/backup-data.d/*.include >> ${INCLUDE_FILE} ;  cat /etc/backup-data.d/*.exclude >> ${EXCLUDE_FILE})
@@ -115,13 +119,12 @@ EOF
 #copy mysql password file
 echo "/etc/my.pwd" >> ${INCLUDE_FILE}
 
-##################mysql hotsync###################
+#mysql hotsync
 if [[ $MYSQL != 'disabled' ]]; then
   if rpm -q --quiet nethserver-mysql; then
     /etc/e-smith/events/actions/mysql-dump-tables
   fi
 fi
-###################################################
 
 XTRA_OPTS=""
 if [ "${1:-unset}" == '--dry-run' ]; then
