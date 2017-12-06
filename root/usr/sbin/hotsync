@@ -96,7 +96,7 @@ fi
 #exclude backup directory 
 echo "/var/lib/nethserver/backup/" >> ${EXCLUDE_FILE}
 
-#exclude nethserver db dir: t's already in configuration backup
+#exclude nethserver db dir: it's already in configuration backup
 echo "/var/lib/nethserver/db/" >> ${EXCLUDE_FILE}
 
 #copy backup config file
