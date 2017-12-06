@@ -10,7 +10,7 @@ EXCLUDE_FILE=$2
 # check that nethserver-webtop5 RPM is installed
 if rpm -q --quiet nethserver-webtop5; then
     # check if postgresql rsync is enabled
-    if [[ $MYSQL != 'disabled' ]]; then
+    if [[ $DATABASES != 'disabled' ]]; then
         /usr/bin/su - postgres -c "pg_dump webtop5 > /var/lib/nethserver/webtop/backup/webtop.sql"
         echo "/var/lib/nethserver/webtop/backup/webtop.sql" >> ${INCLUDE_FILE}
     fi

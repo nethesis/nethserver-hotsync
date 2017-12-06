@@ -1,4 +1,4 @@
 REMOTE_SSH_PORT={$hotsync{RemoteSSHPort} || '22'}
 REMOTE_HOST={$hotsync{RemoteHost}}
 ROLE={$hotsync{role} || 'spare'}
-MYSQL={$hotsync{mysql} || 'enabled'}
+DATABASES={$hotsync{databases} || 'enabled'}
