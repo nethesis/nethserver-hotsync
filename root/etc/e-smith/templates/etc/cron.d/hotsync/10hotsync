@@ -1,5 +1,5 @@
 {
-    if ( ( $hotsync{role} eq 'master' || $hotsync{role} eq 'server') && $hotsync{RemoteHost} eq '')
+    if ( ( $hotsync{role} eq 'master' || $hotsync{role} eq 'server') && $hotsync{SlaveHost} eq '')
     {
         die "Role is master but no remote host is configured!";
     }
@@ -11,8 +11,8 @@
         } else {
             $OUT="#HotSync Master - status disabled";
         }
-    } elsif ( $hotsync{role} eq 'spare') {
-        $OUT="#HotSync Spare\n0 1 * * * root /usr/sbin/hotsync-spare-packages > /dev/null";
+    } elsif ( $hotsync{role} eq 'slave') {
+        $OUT="#HotSync Slave\n0 1 * * * root /usr/sbin/hotsync-slave-packages > /dev/null";
     } else {
         die "Unknow role";
     }

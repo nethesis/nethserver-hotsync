@@ -11,18 +11,12 @@
 [ -f /etc/hotsync.conf ] && source /etc/hotsync.conf
 
 #Use default ssh port if none configured
-if [[ -z ${REMOTE_SSH_PORT} ]] ; then
-    REMOTE_SSH_PORT=22
+if [[ -z ${SLAVE_PORT} ]] ; then
+    SLAVE_PORT=273
 fi
 
-if [[ -z "$REMOTE_HOST" ]] ; then
+if [[ -z "$SLAVE_HOST" ]] ; then
     echo "ERROR: remote host is not configured" >&2  
-    exit 1
-fi
-
-/usr/bin/ssh -o "ConnectTimeout=10" -o "PreferredAuthentications=publickey" -p ${REMOTE_SSH_PORT} root@${REMOTE_HOST} "exit 76" 2>/dev/null
-if [[ $? != "76" ]] ; then
-    echo "ERROR: connection for root@${REMOTE_HOST} is not configured properly. Use hotsync-setup" >&2
     exit 1
 fi
 
@@ -134,10 +128,10 @@ fi
 #copy files with rsync
 # -q
 #    --files-from=${INCLUDE_FILE} --exclude=.ssh/authorized_keys \
-/usr/bin/rsync ${XTRA_OPTS} -z -r -a -H -A -e "/usr/bin/ssh -p ${REMOTE_SSH_PORT} -c blowfish -o PreferredAuthentications=publickey" --delete --numeric-ids \
+RSYNC_PASSWORD=`/sbin/e-smith/config getprop rsyncd password` /usr/bin/rsync ${XTRA_OPTS} -z -r -a -H -A --delete --numeric-ids \
     --files-from=${INCLUDE_FILE} \
     --exclude-from=${EXCLUDE_FILE} \
-    / "root@${REMOTE_HOST}:/" 2>/tmp/hotsync.log
+    / "rsync://hotsyncuser@127.0.0.1/hotsync/" 2>/tmp/hotsync.log
 
 RC=$?
 

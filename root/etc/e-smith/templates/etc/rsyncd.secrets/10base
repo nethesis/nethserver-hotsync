@@ -1,0 +1,11 @@
+{
+    use NethServer::Password;
+    my $role = ${'hotsync'}{'role'} || "";
+    my $password = ${'rsyncd'}{'password'} || "";
+
+    if ($role eq "slave") {
+        $OUT = "hotsyncuser:$password";
+    } else {
+        $OUT = "# only used by slave\n";
+    }
+}

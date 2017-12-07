@@ -1,0 +1,31 @@
+{
+    my $role = ${'hotsync'}{'role'} || "";
+    my $slaveHost = ${'hotsync'}{'SlaveHost'} || "";
+
+    $OUT  = "cert = /etc/stunnel/stunnel.pem\n";
+    
+    $OUT .= "client = ";
+    if ($role eq "master") {
+      $OUT .= "yes";
+    } elsif ($role eq "slave") {
+      $OUT .= "no";
+    }
+    $OUT .= "\n";
+    
+    $OUT .= "[rsync]\n";
+    $OUT .= "accept = ";
+    if ($role eq "master") {
+      $OUT .= "873";
+    } elsif ($role eq "slave") {
+      $OUT .= "273";
+    }
+    $OUT .= "\n";
+
+    $OUT .= "connect = ";
+    if ($role eq "master") {
+      $OUT .= "$slaveHost:273";
+    } elsif ($role eq "slave") {
+      $OUT .= "127.0.0.1:873";
+    }
+    $OUT .= "\n";
+}

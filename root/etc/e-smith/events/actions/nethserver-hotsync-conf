@@ -5,23 +5,38 @@ use esmith::ConfigDB;
 my $conf = esmith::ConfigDB->open || die("Could not open config db\n");
 my $hotsync = $conf->get('hotsync') || die("there's no hotsync key\n");
 my $role = $hotsync->prop('role')  || "";
+my $hotsync_status = $hotsync->prop('status')  || "disabled";
+my $master_host = $hotsync->prop('MasterHost')  || "";
+my $slave_host = $hotsync->prop('SlaveHost')  || "";
 my $backup = $conf->get('backup-config');
 my $BackupStatus = $backup->prop('status') || '';
 
-if ($role eq 'spare') {
-  #configuring spare
+
+if ($role eq 'slave') {
+  #configuring slave
   #disable yum nethserver plugin
   system("sed","-i", 's/enabled = 1/enabled = 0/g',"/etc/yum/pluginconf.d/nethserver_events.conf");
   #disable backup config
   if ($BackupStatus eq 'enabled'){
     $backup->set_prop('status','disabled');
   }
+  if ($hotsync_status eq "enabled" && $master_host ne "") {
+    system("config", "setprop", "rsyncd", "status", "enabled");
+    system("config", "setprop", "stunnel", "status", "enabled");
+    system("config", "setprop", "stunnel", "access", "green");
+    system("/sbin/e-smith/signal-event", "runlevel-adjust");
+    system("/sbin/e-smith/signal-event", "firewall-adjust");
+  }
 } elsif ($role eq 'master' || $role eq 'server') {
   #configuring master
   #enable yum nethserver plugin
   system("sed","-i", 's/enabled = 0/enabled = 1/g',"/etc/yum/pluginconf.d/nethserver_events.conf");
+  if ($role eq 'master' && $hotsync_status eq "enabled" && $slave_host ne "") {
+    system("config", "setprop", "stunnel", "status", "enabled");
+    system("/sbin/e-smith/signal-event", "runlevel-adjust");
+  }
 } else {
-  #not configured as master or spare
+  #not configured as master or slave
   print ("Role not defined\n" );
   exit 0;
 }
