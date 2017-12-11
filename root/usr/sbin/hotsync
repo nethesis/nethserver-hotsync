@@ -147,6 +147,12 @@ RC=$?
 if ! { [ $RC -eq 23 ] || [ $RC -eq 24 ] || [ $RC -eq 0 ] ;} ; then
   (>&2 echo "hotsync error: rsync returned $RC. rsync output:")
   (>&2 cat /tmp/hotsync.log)
+else
+    # Rsync success. Save last sync timestamp in /var/run/nethserver-hotsync/LastSyncTS
+    if [[ ! -d /var/run/nethserver-hotsync ]]; then
+        mkdir -p /var/run/nethserver-hotsync
+    fi
+    echo $(/usr/bin/date +%s) > /var/run/nethserver-hotsync/LastSyncTS
 fi
 
 rm -f /tmp/hotsync.log
