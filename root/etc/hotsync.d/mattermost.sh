@@ -20,10 +20,18 @@
 # along with NethServer.  If not, see COPYING.
 #
 
-#Install on spare server same packages installed on master
+# source configuration file
+[ -f /etc/hotsync.conf ] && source /etc/hotsync.conf
 
-#Extract package file list
-/bin/tar -xf /var/lib/nethserver/backup/backup-config.tar.xz -C / var/lib/nethserver/backup/package-list
+INCLUDE_FILE=$1
+EXCLUDE_FILE=$2
 
-#launch reinstall action
-/etc/e-smith/events/actions/nethserver-backup-config-reinstall
+
+# check that nethserver-webtop5 RPM is installed
+if rpm -q --quiet nethserver-mattermost; then
+    # check if postgresql rsync is enabled
+    if [[ $DATABASES != 'disabled' ]]; then
+	/usr/bin/su - postgres -c "scl enable rh-postgresql94 -- pg_dump --port 55432 mattermost > /var/lib/nethserver/mattermost/backup/mattermost.sql"
+        echo "/var/lib/nethserver/mattermost/backup/mattermost.sql" >> ${INCLUDE_FILE}
+    fi
+fi
