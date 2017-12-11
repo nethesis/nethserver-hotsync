@@ -1,0 +1,22 @@
+{
+    my $role = ${'hotsync'}{'role'} || "";
+    if ($role eq "slave") {
+        $OUT = "lock file = /var/run/rsync.lock
+log file = /var/log/rsyncd.log
+pid file = /var/run/rsyncd.pid
+
+[hotsync]
+    path = /
+    comment = Root filesystem
+    uid = root
+    gid = root
+    read only = no
+    list = yes
+    auth users = hotsyncuser
+    secrets file = /etc/rsyncd.secrets
+    hosts allow = 127.0.0.1\n"
+
+    } else {
+        $OUT = "# only used by slave\n";
+    }
+}

@@ -7,8 +7,8 @@ Group: System Environment/Base
 Source0: %{name}-%{version}.tar.gz
 Packager: Stefano Fancello <stefano.fancello@nethesis.it>
 BuildArch: noarch
+Requires: nethserver-base nethserver-backup-config rsync stunnel
 URL: %{url_prefix}/%{name}
-Requires: nethserver-base nethserver-backup-config rsync
 BuildRequires: nethserver-devtools
 
 %description

@@ -1,0 +1,14 @@
+[Unit]
+Description=Stunnel daemon
+Documentation=man:stunnel(8)
+After=network.target
+
+[Service]
+Type=forking
+User=root
+Restart=always
+ExecStart=/usr/bin/stunnel /etc/stunnel/stunnel.conf
+ExecReload=/bin/kill -SIGUSR1 $MAINPID
+
+[Install]
+WantedBy=multi-user.target
