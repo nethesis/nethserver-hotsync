@@ -1,6 +1,5 @@
-Executable in this directory are executed before syncing.
+Executable files in this directory, are executed before sync.
 
-INCLUDE_FILE and EXCLUDE_FILE are passed as argument. The first one contains the list of file to include in rsync, the second one file to exclude in rsync format. 
-If you whant to add files, append them on INCLUDE_FILE (and on EXCLUDE_FILE for remove em). Append! don't overwrite file!
+INCLUDE_FILE and EXCLUDE_FILE, are the files that contain the list of files to include and exclude. Those two variables are passed as arguments to the scripts of this directory when they are executed.
 
-Make sure your script is executable
+If you whant to add files to sync, append them to the INCLUDE_FILE. Append them to EXCLUDE_FILE to remove files from sync
