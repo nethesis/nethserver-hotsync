@@ -1,10 +1,23 @@
 #!/bin/bash
+
 #
-# Copyright (C) 2013-2015 Nethesis S.r.l.
-# http://www.nethesis.it - support@nethesis.it
-# 
-# Wed Feb 06 2013 Stefano Fancello <stefano.fancello@nethesis.it>
-# Fri Jun 12 2015 Filippo Carletti <filippo.carletti@nethesis.it>
+# Copyright (C) 2017 Nethesis S.r.l.
+# http://www.nethesis.it - nethserver@nethesis.it
+#
+# This script is part of NethServer.
+#
+# NethServer is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License,
+# or any later version.
+#
+# NethServer is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with NethServer.  If not, see COPYING.
 #
 
 # source configuration file
@@ -77,8 +90,12 @@ EXCLUDE_FILE=$(mktemp) || (echo "ERROR! fail creating temporary exclude file"  >
 #trap
 trap "{ rm -f $LOCKFILE; rmdir $LOCKDIR 2>/dev/null; /bin/rm -f ${INCLUDE_FILE} ${EXCLUDE_FILE}; }" INT TERM EXIT
 
-#add default backup config files
-#[ -d /etc/backup-config.d ] && cat /etc/backup-config.d/*.include > ${INCLUDE_FILE}
+#execute custom scripts. Every executable in /etc/hotsync.d is executed. INCLUDE_FILE and EXCLUDE_FILE are passed as arguments.
+if [[ -d /etc/hotsync.d ]]; then
+    for SCRIPT in $(/usr/bin/find /etc/hotsync.d -type f -executable); do
+        ${SCRIPT} ${INCLUDE_FILE} ${EXCLUDE_FILE}
+    done
+fi
 
 #add default backup data files
 [ -d /etc/backup-data.d ] && (cat /etc/backup-data.d/*.include >> ${INCLUDE_FILE} ;  cat /etc/backup-data.d/*.exclude >> ${EXCLUDE_FILE})
@@ -86,10 +103,7 @@ trap "{ rm -f $LOCKFILE; rmdir $LOCKDIR 2>/dev/null; /bin/rm -f ${INCLUDE_FILE} 
 #exclude backup directory 
 echo "/var/lib/nethserver/backup/" >> ${EXCLUDE_FILE}
 
-#include mysql backup
-echo "/var/lib/nethserver/backup/mysql/" >> ${INCLUDE_FILE}
-
-#exclude nethserver db dir
+#exclude nethserver db dir: it's already in configuration backup
 echo "/var/lib/nethserver/db/" >> ${EXCLUDE_FILE}
 
 #copy backup config file
@@ -105,17 +119,6 @@ cat >> ${INCLUDE_FILE} << EOF
 /etc/yum.repos.d/
 /etc/yum.conf
 EOF
-
-#copy mysql password file
-echo "/etc/my.pwd" >> ${INCLUDE_FILE}
-
-##################mysql hotsync###################
-if [[ $MYSQL != 'disabled' ]]; then
-  if rpm -q --quiet nethserver-mysql; then
-    /etc/e-smith/events/actions/mysql-dump-tables
-  fi
-fi
-###################################################
 
 XTRA_OPTS=""
 if [ "${1:-unset}" == '--dry-run' ]; then
@@ -138,6 +141,12 @@ RC=$?
 if ! { [ $RC -eq 23 ] || [ $RC -eq 24 ] || [ $RC -eq 0 ] ;} ; then
   (>&2 echo "hotsync error: rsync returned $RC. rsync output:")
   (>&2 cat /tmp/hotsync.log)
+else
+    # Rsync success. Save last sync timestamp in /var/run/nethserver-hotsync/LastSyncTS
+    if [[ ! -d /var/run/nethserver-hotsync ]]; then
+        mkdir -p /var/run/nethserver-hotsync
+    fi
+    echo $(/usr/bin/date +%s) > /var/run/nethserver-hotsync/LastSyncTS
 fi
 
 rm -f /tmp/hotsync.log

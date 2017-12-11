@@ -1,4 +1,5 @@
 #!/bin/bash
+
 #
 # Copyright (C) 2017 Nethesis S.r.l.
 # http://www.nethesis.it - nethserver@nethesis.it
@@ -18,10 +19,22 @@
 # You should have received a copy of the GNU General Public License
 # along with NethServer.  If not, see COPYING.
 #
-# Install on spare server same packages installed on master
 
-# Extract package file list
-/bin/tar -xf /var/lib/nethserver/backup/backup-config.tar.xz -C / var/lib/nethserver/backup/package-list
+# source configuration file
+[ -f /etc/hotsync.conf ] && source /etc/hotsync.conf
 
-# launch reinstall action
-/etc/e-smith/events/actions/nethserver-backup-config-reinstall
+INCLUDE_FILE=$1
+EXCLUDE_FILE=$2
+
+#mysql hotsync
+if rpm -q --quiet nethserver-mysql; then
+    if [[ $DATABASES != 'disabled' ]]; then
+        # dump mysql tables
+        /etc/e-smith/events/actions/mysql-dump-tables
+        #include mysql password file
+        echo "/etc/my.pwd" >> ${INCLUDE_FILE}
+        #include mysql backup
+        echo "/var/lib/nethserver/backup/mysql/" >> ${INCLUDE_FILE}
+    fi
+fi
+

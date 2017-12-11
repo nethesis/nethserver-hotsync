@@ -1,4 +1,5 @@
 #!/bin/bash
+
 #
 # Copyright (C) 2017 Nethesis S.r.l.
 # http://www.nethesis.it - nethserver@nethesis.it
@@ -18,10 +19,19 @@
 # You should have received a copy of the GNU General Public License
 # along with NethServer.  If not, see COPYING.
 #
-# Install on spare server same packages installed on master
 
-# Extract package file list
-/bin/tar -xf /var/lib/nethserver/backup/backup-config.tar.xz -C / var/lib/nethserver/backup/package-list
+# source configuration file
+[ -f /etc/hotsync.conf ] && source /etc/hotsync.conf
 
-# launch reinstall action
-/etc/e-smith/events/actions/nethserver-backup-config-reinstall
+INCLUDE_FILE=$1
+EXCLUDE_FILE=$2
+
+
+# check that nethserver-webtop5 RPM is installed
+if rpm -q --quiet nethserver-webtop5; then
+    # check if postgresql rsync is enabled
+    if [[ $DATABASES != 'disabled' ]]; then
+        /usr/bin/su - postgres -c "pg_dump webtop5 > /var/lib/nethserver/webtop/backup/webtop.sql"
+        echo "/var/lib/nethserver/webtop/backup/webtop.sql" >> ${INCLUDE_FILE}
+    fi
+fi

@@ -1,4 +1,4 @@
-SLAVE_PORT={$hotsync{SlavePort} || '22'}
+SLAVE_PORT={$hotsync{SlavePort} || '273'}
 SLAVE_HOST={$hotsync{SlaveHost}}
 ROLE={$hotsync{role} || 'slave'}
-MYSQL={$hotsync{mysql} || 'enabled'}
+DATABASES={$hotsync{databases} || 'enabled'}
