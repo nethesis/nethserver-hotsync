@@ -29,7 +29,7 @@ if [ ! -f $backup_dir/mysql.dump ]; then
     exit 0
 fi
 
-if [[ x$(/sbin/e-smith/config getprop hotsync mysql) == "xdisabled" ]] ; then 
+if [[ x$(/sbin/e-smith/config getprop hotsync databases) == "xdisabled" ]] ; then 
     exit 0
 fi
 

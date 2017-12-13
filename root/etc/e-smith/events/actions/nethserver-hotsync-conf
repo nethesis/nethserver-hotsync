@@ -50,8 +50,6 @@ if ($role eq 'slave') {
   }
 } elsif ($role eq 'master' || $role eq 'server') {
   #configuring master
-  #enable yum nethserver plugin
-  system("sed","-i", 's/enabled = 0/enabled = 1/g',"/etc/yum/pluginconf.d/nethserver_events.conf");
   if ($role eq 'master' && $hotsync_status eq "enabled" && $slave_host ne "") {
     system("config", "setprop", "stunnel", "status", "enabled");
     system("/sbin/e-smith/signal-event", "runlevel-adjust");
