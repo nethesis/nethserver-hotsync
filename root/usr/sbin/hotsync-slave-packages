@@ -25,3 +25,11 @@
 
 # launch reinstall action
 /etc/e-smith/events/actions/restore-config-reinstall
+
+# load configuration backup on interface if its md5 is equal to its md5file
+backupfile="/var/lib/nethserver/backup/backup-config.tar.xz"
+md5file="${backupfile}.md5"
+md5sum backupfile 2>/dev/null | grep -q $(cut -f 1 -d ' ' "${md5file}")
+if [[ $? == 0 ]]; then
+    /etc/e-smith/events/actions/nethserver-backup-config-push2history
+fi
