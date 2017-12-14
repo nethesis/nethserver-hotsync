@@ -118,7 +118,6 @@ echo "/etc/group" >> ${INCLUDE_FILE}
 #copy yum configuration
 cat >> ${INCLUDE_FILE} << EOF
 /etc/yum/vars/serverid
-/etc/yum.repos.d/
 /etc/yum.conf
 EOF
 
