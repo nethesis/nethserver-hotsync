@@ -108,6 +108,8 @@ echo "/var/lib/nethserver/db/" >> ${EXCLUDE_FILE}
 
 #copy backup config file
 echo "/var/lib/nethserver/backup/backup-config.tar.xz" >> ${INCLUDE_FILE}
+echo "/var/lib/nethserver/backup/backup-config.tar.xz-content.md5" >> ${INCLUDE_FILE}
+echo "/var/lib/nethserver/backup/backup-config.tar.xz.md5" >> ${INCLUDE_FILE}
 
 #copy passwd and group file 
 echo "/etc/passwd" >> ${INCLUDE_FILE}
