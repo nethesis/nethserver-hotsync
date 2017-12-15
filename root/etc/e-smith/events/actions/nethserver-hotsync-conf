@@ -45,14 +45,15 @@ if ($role eq 'slave') {
     system("config", "setprop", "rsyncd", "status", "enabled");
     system("config", "setprop", "stunnel", "status", "enabled");
     system("config", "setprop", "stunnel", "access", "green");
-    system("/sbin/e-smith/signal-event", "runlevel-adjust");
     system("/sbin/e-smith/signal-event", "firewall-adjust");
+    system("/usr/bin/systemctl", "start","rsyncd");
+    system("/usr/bin/systemctl", "start","stunnel");
   }
 } elsif ($role eq 'master' || $role eq 'server') {
   #configuring master
   if ($role eq 'master' && $hotsync_status eq "enabled" && $slave_host ne "") {
     system("config", "setprop", "stunnel", "status", "enabled");
-    system("/sbin/e-smith/signal-event", "runlevel-adjust");
+    system("/usr/bin/systemctl", "start","stunnel");
   }
 } else {
   #not configured as master or slave
