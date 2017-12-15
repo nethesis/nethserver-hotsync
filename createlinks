@@ -40,4 +40,3 @@ event_templates($event, qw(
 ));
 templates2events("/etc/stunnel/stunnel.pem","certificate-update");
 event_actions('post-restore-config', 'nethserver-hotsync-yum-plugins-conf' => '40');
-event_actions('post-restore-config', 'nethserver-hotsync-load-mysql-tables' => '80');
