@@ -131,16 +131,15 @@ fi
 /sbin/e-smith/backup-config
 
 # keep only existing, readable files and directories in include list
-TMPFILE=$(mktemp)
 SAVEIFS=$IFS
 IFS=$(echo -en "\n\b")
+TMPLIST=""
 for FILE in $(cat ${INCLUDE_FILE}) ; do
     if [[ -r ${FILE} && ( -f ${FILE} || -d ${FILE} ) ]]; then
-        echo "${FILE}" >> ${TMPFILE}
+        TMPLIST="${TMPLIST}${FILE}\n"
     fi
 done
-cat ${TMPFILE} > ${INCLUDE_FILE}
-rm -f ${TMPFILE}
+echo -e ${TMPLIST} > ${INCLUDE_FILE}
 IFS=$SAVEIFS
 
 #copy files with rsync
