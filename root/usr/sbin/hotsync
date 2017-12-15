@@ -117,7 +117,8 @@ echo "/etc/group" >> ${INCLUDE_FILE}
 
 #copy yum configuration
 cat >> ${INCLUDE_FILE} << EOF
-/etc/yum/vars/serverid
+/etc/yum/vars
+/etc/yum.repos.d
 /etc/yum.conf
 EOF
 
@@ -126,8 +127,20 @@ if [ "${1:-unset}" == '--dry-run' ]; then
     XTRA_OPTS="--dry-run -v"
 fi
 
-#launch backup before rsync
+# launch backup before rsync
 /sbin/e-smith/backup-config
+
+# keep only existing, readable files and directories in include list
+SAVEIFS=$IFS
+IFS=$(echo -en "\n\b")
+TMPLIST=""
+for FILE in $(cat ${INCLUDE_FILE}) ; do
+    if [[ -r ${FILE} && ( -f ${FILE} || -d ${FILE} ) ]]; then
+        TMPLIST="${TMPLIST}${FILE}\n"
+    fi
+done
+echo -e ${TMPLIST} > ${INCLUDE_FILE}
+IFS=$SAVEIFS
 
 #copy files with rsync
 # -q
