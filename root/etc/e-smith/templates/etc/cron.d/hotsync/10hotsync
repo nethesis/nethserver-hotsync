@@ -12,7 +12,7 @@
             $OUT="#HotSync Master - status disabled";
         }
     } elsif ( $hotsync{role} eq 'slave') {
-        $OUT="#HotSync Slave\n0 1 * * * root /usr/sbin/hotsync-slave-packages > /dev/null";
+        $OUT="#HotSync Slave\n0 1 * * * root /usr/sbin/hotsync-slave > /dev/null";
     } else {
         die "Unknow role";
     }
