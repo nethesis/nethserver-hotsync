@@ -42,9 +42,9 @@ if ($role eq 'slave') {
     $backup->set_prop('status','disabled');
   }
   if ($hotsync_status eq "enabled" && $master_host ne "") {
-    system("config", "setprop", "rsyncd", "status", "enabled");
-    system("config", "setprop", "stunnel", "status", "enabled");
-    system("config", "setprop", "stunnel", "access", "green");
+    system("/sbin/e-smith/config", "setprop", "rsyncd", "status", "enabled");
+    system("/sbin/e-smith/config", "setprop", "stunnel", "status", "enabled");
+    system("/sbin/e-smith/config", "setprop", "stunnel", "access", "green");
     system("/sbin/e-smith/signal-event", "firewall-adjust");
     system("/usr/bin/systemctl", "start","rsyncd");
     system("/usr/bin/systemctl", "start","stunnel");
@@ -52,7 +52,7 @@ if ($role eq 'slave') {
 } elsif ($role eq 'master' || $role eq 'server') {
   #configuring master
   if ($role eq 'master' && $hotsync_status eq "enabled" && $slave_host ne "") {
-    system("config", "setprop", "stunnel", "status", "enabled");
+    system("/sbin/e-smith/config", "setprop", "stunnel", "status", "enabled");
     system("/usr/bin/systemctl", "start","stunnel");
   }
 } else {
