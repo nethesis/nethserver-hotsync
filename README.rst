@@ -95,8 +95,6 @@ Supported packages
 
 * nethserver-nextcloud
 * nethserver-mysql
-* nethserver-postgresql
-* nethserver-webtop5
 * nethserver-mattermost
 * nethserver-dnsmasq
 * nethserver-squidguard
@@ -105,6 +103,16 @@ Supported packages
 * nethserver-samba-audit
 * nethserver-freepbx > 14.0.3
 * nethserver-webtop5 (z-push state is not synchronized)
+* nethserver-collectd: sync /var/lib/collected
+* nethserver-cups
+* nethserver-dc
+* nethserver-letsencrypt
+* nethserver-nextcloud
+* nethserver-sssd
+* nethserver-directory
+* nethserver-ibays
+* nethserver-mail-server
+
 
 ===============================
 How to synchronize custom paths
