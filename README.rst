@@ -65,14 +65,10 @@ How to restore
 The following procedure are to put the SLAVE in production when the master has been crashed.
 
 1. switch off MASTER
-2. from SLAVE bash execute: ::
-
-       # hotsync-slave
-
-3. from NethGUI go to "Backup (configuration)" and restore the configuration backup (data is already synchronized)
-4. manually connect the modem to SLAVE machine
-5. connect backup HD to SLAVE
-6. connect the router
+2. from NethGUI go to "Backup (configuration)" and restore the configuration backup (data is already synchronized)
+3. manually connect the modem to SLAVE machine
+4. connect backup HD to SLAVE
+5. connect the router
 
 ==============================
 How to restore original server
@@ -89,30 +85,6 @@ To put again in production original crashed server:
 
 5. restore configuration backup
 
-==================
-Supported packages
-==================
-
-* nethserver-nextcloud
-* nethserver-mysql
-* nethserver-mattermost
-* nethserver-dnsmasq
-* nethserver-squidguard
-* nethserver-pulledpork
-* nethserver-antivirus
-* nethserver-samba-audit
-* nethserver-freepbx > 14.0.3
-* nethserver-webtop5 (z-push state is not synchronized)
-* nethserver-collectd: sync /var/lib/collected
-* nethserver-cups
-* nethserver-dc
-* nethserver-letsencrypt
-* nethserver-nextcloud
-* nethserver-sssd
-* nethserver-directory
-* nethserver-ibays
-* nethserver-mail-server
-
 
 ===============================
 How to synchronize custom paths
@@ -124,13 +96,23 @@ It is possible to customize HotSync adding all kind of data through the use of *
 
 If you want to add files to the synchronization, append them to the INCLUDE_FILE. Append them to EXCLUDE_FILE to remove from the synchronization.
 
-============================
-How to force synchronization
-============================
+=================================================
+How to force synchronization from MASTER to SLAVE
+=================================================
 
 From MASTER bash launch the command: ::
 
     # hotsync
+
+===========================================
+How to force packages installation on SLAVE
+===========================================
+
+*"hotsync-slave"* script extracts from MASTER configuration backup the
+list of packages to install and install them. You can force the operation
+executing bash command: ::
+
+    # hotsync-slave
 
 ==========
 Components
@@ -154,4 +136,56 @@ hotsync
 hotsync-slave
 =============
 
-Executed on SLAVE, extracts from MASTER configuration backup the list of packages to install and install them.
+Automatically executed on SLAVE every 60 minutes, extracts from MASTER
+configuration backup the list of packages to install and install them.
+
+==================
+Supported packages
+==================
+
+- nethserver-nextcloud
+- nethserver-mysql
+- nethserver-dnsmasq
+- nethserver-squidguard
+- nethserver-pulledpork
+- nethserver-antivirus
+- nethserver-samba-audit
+- nethserver-freepbx > 14.0.3
+- nethserver-webtop5 (z-push state is not synchronized)
+- nethserver-collectd
+- nethserver-cups
+- nethserver-dc
+- nethserver-letsencrypt
+- nethserver-nextcloud
+- nethserver-sssd
+- nethserver-directory
+- nethserver-ibays
+- nethserver-mail-server
+
+======================
+Not supported packages
+======================
+
+- nethserver-evebox
+- nethserver-getmail
+- nethserver-ntopng
+
+
+====================================================
+HotSync management using Cockpit Graphical Interface
+====================================================
+
+It can be possible to administrate HotSync from cockpit web graphical interface installing `nethserver-cockpit-hotsync`.
+
+
+Configuration using Cockpit Web Gui
+===================================
+
+- On both MASTER and SLAVE browse to cockpit web gui -> "Applications" -> "NethServer Hotsync" -> "Settings"
+- select the "role", then insert the requested data and click "Save" button
+
+Restore using Cockpit Web Gui
+=============================
+
+- From SLAVE browse to cockpit web gui -> "Applications" -> "NethServer Hotsync" -> "Settings"
+- click on "Promote to Master" button
