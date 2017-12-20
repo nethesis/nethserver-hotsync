@@ -22,8 +22,11 @@
 use esmith::Build::CreateLinks  qw(:all);
 use File::Path;
 
+
+templates2events("/etc/stunnel/stunnel.pem","certificate-update");
+
 #--------------------------------------------------
-# actions for nethserver-nethserverenterprise-branding-update event
+# actions for nethserver-hotsync-update event
 #--------------------------------------------------
 
 $event = "nethserver-hotsync-update";
@@ -38,5 +41,11 @@ event_templates($event, qw(
                 /etc/stunnel/stunnel.conf
                 /etc/stunnel/stunnel.pem
 ));
-templates2events("/etc/stunnel/stunnel.pem","certificate-update");
-event_actions('post-restore-config', 'nethserver-hotsync-yum-plugins-conf' => '40');
+
+#--------------------------------------------------
+# actions for nethserver-hotsync-restore event
+#--------------------------------------------------
+
+$event = 'nethserver-hotsync-restore';
+event_actions($event, 'nethserver-hotsync-yum-plugins-conf' => '40');
+event_actions($event, 'nethserver-hotsync-slave-restore' => '50');
