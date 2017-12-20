@@ -65,7 +65,10 @@ How to restore
 The following procedure are to put the SLAVE in production when the master has been crashed.
 
 1. switch off MASTER
-2. from NethGUI go to "Backup (configuration)" and restore the configuration backup (data is already synchronized)
+2. on SLAVE launch command ::
+
+    [root@slave]# signal-event nethserver-hotsync-restore
+
 3. manually connect the modem to SLAVE machine
 4. connect backup HD to SLAVE
 5. connect the router
