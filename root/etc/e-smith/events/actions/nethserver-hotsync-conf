@@ -53,6 +53,8 @@ if ($role eq 'slave') {
   #configuring master
   if ($role eq 'master' && $hotsync_status eq "enabled" && $slave_host ne "") {
     system("/sbin/e-smith/config", "setprop", "stunnel", "status", "enabled");
+    system("/sbin/e-smith/config", "setprop", "rsyncd", "status", "disabled");
+    system("/sbin/e-smith/signal-event", "firewall-adjust");
     system("/usr/bin/systemctl", "start","stunnel");
   }
 } else {
