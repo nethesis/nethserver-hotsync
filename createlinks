@@ -42,6 +42,10 @@ event_templates($event, qw(
                 /etc/stunnel/stunnel.pem
 ));
 
+event_services('nethserver-hotsync-update', qw(
+		stunnel restart
+));
+
 #--------------------------------------------------
 # actions for nethserver-hotsync-restore event
 #--------------------------------------------------
