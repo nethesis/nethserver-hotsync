@@ -1,6 +1,6 @@
 Summary: NethServer Enterprise Hotsync 
 Name: nethserver-hotsync
-Version: 1.0.0
+Version: 2.0.0
 Release: 1%{?dist}
 License: Firmware
 Group: System Environment/Base
@@ -36,6 +36,9 @@ rm -rf %{buildroot}
 %dir %{_nseventsdir}/%{name}-update
 
 %changelog
+* Fri Jan 12 2018 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 2.0.0-1
+- nethserver-hotsync: new implementation for NS 7 - NethServer/dev#5401
+
 * Fri Jul 15 2016 Stefano Fancello <stefano.fancello@nethesis.it> - 1.0.0-1
 - First package
 
