@@ -68,7 +68,7 @@ The following procedure are to put the SLAVE in production when the master has b
     [root@slave]# restore-config
 
 3. connect the router if needed
-4. Go on NethGUI interface and assigno role to interfaces if there are more than one
+4. Go to Server Manager page ``Network`` and reassign roles to network interfaces if required
 5. on SLAVE launch command ::
 
     [root@slave]# /sbin/e-smith/signal-event post-restore-data
