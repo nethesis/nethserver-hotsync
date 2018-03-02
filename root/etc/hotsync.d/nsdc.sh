@@ -23,23 +23,14 @@
 # source configuration file
 [ -f /etc/hotsync.conf ] && source /etc/hotsync.conf
 
-if [[ $ROLE != 'slave' ]]; then
-    echo "ERROR: Promotion to MASTER is possible only for SLAVE"
-    exit 1
+INCLUDE_FILE=$1
+EXCLUDE_FILE=$2
+
+
+# copy nsdc machine
+if rpm -q --quiet nethserver-dc; then
+    # check nsdc machine directory exists
+    if [[ -d "/var/lib/machines/nsdc" ]]; then
+        echo "/var/lib/machines/nsdc" >> ${INCLUDE_FILE}
+    fi
 fi
-
-# Enable NethServer events after yum
-sed -i 's/enabled = 0/enabled = 1/g' /etc/yum/pluginconf.d/nethserver_events.conf
-
-/sbin/e-smith/restore-config
-
-# Check if network roles need to be assigned
-flag=/var/run/.nethserver-fixnetwork
-echo "Configuration restore completed!"
-if [[ ! -f $flag ]]; then
-    echo "To complete promotion to master, launch"
-else 
-    echo "Go to Server Manager page \"Network\" and reassign roles to network interfaces"
-    echo "and complete promotion to master by launching"
-fi
-echo "   /sbin/e-smith/signal-event post-restore-data"

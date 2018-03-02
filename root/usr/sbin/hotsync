@@ -122,14 +122,6 @@ cat >> ${INCLUDE_FILE} << EOF
 /etc/yum.conf
 EOF
 
-#copy nsdc machine
-if rpm -q --quiet nethserver-dc; then
-    # check nsdb machine directory exists
-    if [[ -d "/var/lib/machines/nsdc" ]]; then
-        echo "/var/lib/machines/nsdc" >> ${INCLUDE_FILE}
-    fi
-fi
-
 XTRA_OPTS=""
 if [ "${1:-unset}" == '--dry-run' ]; then
     XTRA_OPTS="--dry-run -v"
