@@ -65,7 +65,7 @@ The following procedure are to put the SLAVE in production when the master has b
 1. switch off MASTER
 2. on SLAVE launch command ::
 
-    [root@slave]# restore-config
+    [root@slave]# hotsync-promote
 
 3. connect the router if needed
 4. Go to Server Manager page ``Network`` and reassign roles to network interfaces if required
