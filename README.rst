@@ -67,7 +67,7 @@ The following procedure are to put the SLAVE in production when the master has b
 
     [root@slave]# hotsync-promote
 
-3. connect the router if needed
+3. If the slave machine has to run as network gateway, connect it to the router/modem with a network cable
 4. Go to Server Manager page ``Network`` and reassign roles to network interfaces if required
 5. on SLAVE launch command ::
 
