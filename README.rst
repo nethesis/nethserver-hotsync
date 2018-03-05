@@ -65,11 +65,16 @@ The following procedure are to put the SLAVE in production when the master has b
 1. switch off MASTER
 2. on SLAVE launch command ::
 
-    [root@slave]# signal-event nethserver-hotsync-restore
+    [root@slave]# hotsync-promote
 
-3. manually connect the modem to SLAVE machine
-4. connect backup HD to SLAVE
-5. connect the router
+3. If the slave machine has to run as network gateway, connect it to the router/modem with a network cable
+4. Go to Server Manager page ``Network`` and reassign roles to network interfaces if required
+5. on SLAVE launch command ::
+
+    [root@slave]# /sbin/e-smith/signal-event post-restore-data
+
+6. manually connect the modem to SLAVE machine if needed
+7. connect backup HD to SLAVE if needed
 
 How to restore original server
 ==============================

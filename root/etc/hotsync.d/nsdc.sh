@@ -1,7 +1,7 @@
-#!/usr/bin/perl 
+#!/bin/bash
 
 #
-# Copyright (C) 2017 Nethesis S.r.l.
+# Copyright (C) 2018 Nethesis S.r.l.
 # http://www.nethesis.it - nethserver@nethesis.it
 #
 # This script is part of NethServer.
@@ -20,16 +20,17 @@
 # along with NethServer.  If not, see COPYING.
 #
 
-use strict;
-use esmith::ConfigDB;
+# source configuration file
+[ -f /etc/hotsync.conf ] && source /etc/hotsync.conf
 
-my $conf = esmith::ConfigDB->open || die("Could not open config db\n");
-my $hotsync = $conf->get('hotsync') || die("there's no hotsync key\n");
-my $role = $hotsync->prop('role')  || "";
-
-if ($role eq 'master' || $role eq 'server') {
-  #enable yum nethserver plugin
-  system("sed","-i", 's/enabled = 0/enabled = 1/g',"/etc/yum/pluginconf.d/nethserver_events.conf");
-}
+INCLUDE_FILE=$1
+EXCLUDE_FILE=$2
 
 
+# copy nsdc machine
+if rpm -q --quiet nethserver-dc; then
+    # check nsdc machine directory exists
+    if [[ -d "/var/lib/machines/nsdc" ]]; then
+        echo "/var/lib/machines/nsdc" >> ${INCLUDE_FILE}
+    fi
+fi

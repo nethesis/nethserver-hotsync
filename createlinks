@@ -45,11 +45,3 @@ event_templates($event, qw(
 event_services('nethserver-hotsync-update', qw(
 		stunnel restart
 ));
-
-#--------------------------------------------------
-# actions for nethserver-hotsync-restore event
-#--------------------------------------------------
-
-$event = 'nethserver-hotsync-restore';
-event_actions($event, 'nethserver-hotsync-yum-plugins-conf' => '40');
-event_actions($event, 'nethserver-hotsync-slave-restore' => '50');
