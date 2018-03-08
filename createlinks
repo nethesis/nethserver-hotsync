@@ -45,10 +45,12 @@ event_actions('nethserver-hotsync-update', qw(
 event_templates('nethserver-hotsync-save', @templates);
 event_actions('nethserver-hotsync-save', qw(
     nethserver-hotsync-conf 70
+    firewall-adjust 89
     backup-config-execute 90
 ));
 event_services('nethserver-hotsync-save', qw(
     stunnel restart
+    rsyncd restart
 ));
 
 #--------------------------------------------------
