@@ -64,7 +64,7 @@ The following procedure puts the SLAVE in production when the master has crashed
 
 1. switch off MASTER
 2. if the SLAVE machine must run as network gateway, connect it to the router/modem with a network cable
-3. Following command change IP address and cut off network connection. If you are connected through an ssh console, launch the screen command ::
+3. following command changes the IP address and cuts off the network connection. If you are connected through an ssh console, launch the ``screen`` command ::
 
     [root@slave]# screen
 
