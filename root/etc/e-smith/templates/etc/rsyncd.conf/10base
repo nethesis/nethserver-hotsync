@@ -14,7 +14,7 @@ pid file = /var/run/rsyncd.pid
     list = yes
     auth users = hotsyncuser
     secrets file = /etc/rsyncd.secrets
-    hosts allow = 127.0.0.1\n"
+    hosts allow = 127.0.0.1\n";
 
     } else {
         $OUT = "# only used by slave\n";

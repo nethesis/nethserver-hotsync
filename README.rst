@@ -41,40 +41,39 @@ MASTER configuration: ::
     [root@master]# config setprop rsyncd password <PASSWORD>
     [root@master]# config setprop hotsync role master
     [root@master]# config setprop hotsync SlaveHost <SLAVE_IP>
-    [root@master]# signal-event nethserver-hotsync-update
+    [root@master]# signal-event nethserver-hotsync-save
 
 SLAVE configuration: ::
 
     [root@slave]# config setprop rsyncd password <PASSWORD>
     [root@slave]# config setprop hotsync role slave
     [root@slave]# config setprop hotsync MasterHost <MASTER_IP>
-    [root@slave]# signal-event nethserver-hotsync-update
+    [root@slave]# signal-event nethserver-hotsync-save
 
 **The <PASSWORD> must be the same on both master and slave.**
 
 If *MySQL* or *PostgreSQL* are installed, they will be synchronized by default. To disable databases synchronization: ::
 
     [root@master]# config setprop hotsync databases disabled
-    [root@master]# signal-event nethserver-hotsync-update
+    [root@master]# signal-event nethserver-hotsync-save
 
 How to restore
 ==============
 
-The following procedure are to put the SLAVE in production when the master has been crashed.
+The following procedure puts the SLAVE in production when the master has crashed.
 
 1. switch off MASTER
-2. on SLAVE launch command ::
+2. if the SLAVE machine must run as network gateway, connect it to the router/modem with a network cable
+3. on SLAVE launch command, and read carefully its output ::
 
     [root@slave]# hotsync-promote
 
-3. If the slave machine has to run as network gateway, connect it to the router/modem with a network cable
-4. Go to Server Manager page ``Network`` and reassign roles to network interfaces if required
-5. on SLAVE launch command ::
+4. go to Server Manager page ``Network`` and reassign roles to network interfaces if required
+5. launch command ::
 
     [root@slave]# /sbin/e-smith/signal-event post-restore-data
 
-6. manually connect the modem to SLAVE machine if needed
-7. connect backup HD to SLAVE if needed
+6. if an USB backup is configured on MASTER, connect the backup HD to SLAVE
 
 How to restore original server
 ==============================
