@@ -33,13 +33,30 @@ sed -i 's/enabled = 0/enabled = 1/g' /etc/yum/pluginconf.d/nethserver_events.con
 
 /sbin/e-smith/restore-config
 
+if [[ $? == 0 ]]; then
+    echo "[NOTICE] Configuration restore completed!"
+else
+    echo "[ERROR] restore-config failed. Last error messages from /var/log/messages:  "
+    echo ""
+    grep -E '(ERROR|FAIL)' /var/log/messages | tail -15 | sed 's/^/    /'
+    echo ""
+    ((++exit_code))
+fi
+
 # Check if network roles need to be assigned
 flag=/var/run/.nethserver-fixnetwork
-echo "Configuration restore completed!"
 if [[ ! -f $flag ]]; then
     echo "To complete promotion to master, launch"
+    echo ""
+    echo "   /sbin/e-smith/signal-event post-restore-data"
+    echo ""
 else 
     echo "Go to Server Manager page \"Network\" and reassign roles to network interfaces"
     echo "and complete promotion to master by launching"
+    echo ""
+    echo "   /sbin/e-smith/signal-event post-restore-data"
+    echo ""
+    ((++exit_code))
 fi
-echo "   /sbin/e-smith/signal-event post-restore-data"
+
+exit ${exit_code}

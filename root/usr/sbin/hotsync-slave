@@ -26,6 +26,11 @@
 # launch reinstall action
 /etc/e-smith/events/actions/restore-config-reinstall
 
+if [[ $? != 0 ]]; then
+    echo "[ERROR] restore-config-reinstall failed!" 1>&2
+    exit 1
+fi
+
 # load configuration backup on interface if its md5 is equal to its md5file
 backupfile="/var/lib/nethserver/backup/backup-config.tar.xz"
 md5file="${backupfile}.md5"
