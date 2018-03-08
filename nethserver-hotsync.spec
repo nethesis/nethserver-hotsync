@@ -34,6 +34,8 @@ rm -rf %{buildroot}
 %files -f %{name}-%{version}-%{release}-filelist
 %defattr(-,root,root)
 %dir %{_nseventsdir}/%{name}-update
+%doc README.rst
+
 
 %changelog
 * Fri Jan 12 2018 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 2.0.0-1
