@@ -22,26 +22,38 @@
 use esmith::Build::CreateLinks  qw(:all);
 use File::Path;
 
-
-templates2events("/etc/stunnel/stunnel.pem","certificate-update");
+my @templates = qw(
+    /etc/cron.d/hotsync
+    /etc/hotsync.conf
+    /etc/rsyncd.conf
+    /etc/rsyncd.secrets
+    /etc/stunnel/stunnel.conf
+    /etc/stunnel/stunnel.pem
+);
 
 #--------------------------------------------------
 # actions for nethserver-hotsync-update event
 #--------------------------------------------------
-
-$event = "nethserver-hotsync-update";
-event_actions($event, 'initialize-default-databases' => '00');
-event_actions($event, 'nethserver-hotsync-conf' => '70');
-event_actions($event, 'backup-config-execute' => '90');
-event_templates($event, qw(
-                /etc/cron.d/hotsync
-                /etc/hotsync.conf
-                /etc/rsyncd.conf
-                /etc/rsyncd.secrets
-                /etc/stunnel/stunnel.conf
-                /etc/stunnel/stunnel.pem
+event_templates('nethserver-hotsync-update', @templates);
+event_actions('nethserver-hotsync-update', qw(
+    initialize-default-databases 00
 ));
 
-event_services('nethserver-hotsync-update', qw(
-		stunnel restart
+#--------------------------------------------------
+# actions for nethserver-hotsync-save event
+#--------------------------------------------------
+event_templates('nethserver-hotsync-save', @templates);
+event_actions('nethserver-hotsync-save', qw(
+    nethserver-hotsync-conf 70
+    backup-config-execute 90
+));
+event_services('nethserver-hotsync-save', qw(
+    stunnel restart
+));
+
+#--------------------------------------------------
+# actions for certificate-update event
+#--------------------------------------------------
+event_templates('certificate-update', qw(
+    /etc/stunnel/stunnel.pem
 ));

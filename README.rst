@@ -41,21 +41,21 @@ MASTER configuration: ::
     [root@master]# config setprop rsyncd password <PASSWORD>
     [root@master]# config setprop hotsync role master
     [root@master]# config setprop hotsync SlaveHost <SLAVE_IP>
-    [root@master]# signal-event nethserver-hotsync-update
+    [root@master]# signal-event nethserver-hotsync-save
 
 SLAVE configuration: ::
 
     [root@slave]# config setprop rsyncd password <PASSWORD>
     [root@slave]# config setprop hotsync role slave
     [root@slave]# config setprop hotsync MasterHost <MASTER_IP>
-    [root@slave]# signal-event nethserver-hotsync-update
+    [root@slave]# signal-event nethserver-hotsync-save
 
 **The <PASSWORD> must be the same on both master and slave.**
 
 If *MySQL* or *PostgreSQL* are installed, they will be synchronized by default. To disable databases synchronization: ::
 
     [root@master]# config setprop hotsync databases disabled
-    [root@master]# signal-event nethserver-hotsync-update
+    [root@master]# signal-event nethserver-hotsync-save
 
 How to restore
 ==============
