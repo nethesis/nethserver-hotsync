@@ -64,16 +64,20 @@ The following procedure puts the SLAVE in production when the master has crashed
 
 1. switch off MASTER
 2. if the SLAVE machine must run as network gateway, connect it to the router/modem with a network cable
-3. on SLAVE launch command, and read carefully its output ::
+3. following command changes the IP address and cuts off the network connection. If you are connected through an ssh console, launch the ``screen`` command ::
+
+    [root@slave]# screen
+
+4. on SLAVE launch command, and read carefully its output ::
 
     [root@slave]# hotsync-promote
 
-4. go to Server Manager page ``Network`` and reassign roles to network interfaces if required
-5. launch command ::
+5. go to Server Manager page ``Network`` and reassign roles to network interfaces if required
+6. launch command ::
 
     [root@slave]# /sbin/e-smith/signal-event post-restore-data
 
-6. if an USB backup is configured on MASTER, connect the backup HD to SLAVE
+7. if an USB backup is configured on MASTER, connect the backup HD to SLAVE
 
 How to restore original server
 ==============================
