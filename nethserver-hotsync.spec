@@ -1,6 +1,6 @@
 Summary: NethServer Enterprise Hotsync 
 Name: nethserver-hotsync
-Version: 2.0.0
+Version: 2.0.1
 Release: 1%{?dist}
 License: Firmware
 Group: System Environment/Base
@@ -38,6 +38,9 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Mon Mar 12 2018 Davide Principi <davide.principi@nethesis.it> - 2.0.1-1
+- Hotsync restore fails with no internet connection - Bug NethServer/dev#5430
+
 * Fri Jan 12 2018 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 2.0.0-1
 - nethserver-hotsync: new implementation for NS 7 - NethServer/dev#5401
 
