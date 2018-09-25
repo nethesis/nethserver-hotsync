@@ -165,9 +165,8 @@ Supported packages
 - nethserver-ibays
 - nethserver-mail-server
 
-======================
-Not supported packages
-======================
+Unsupported packages
+====================
 
 - nethserver-evebox
 - nethserver-getmail
