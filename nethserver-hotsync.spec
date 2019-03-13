@@ -5,6 +5,9 @@ Release: 1%{?dist}
 License: Firmware
 Group: System Environment/Base
 Source0: %{name}-%{version}.tar.gz
+# Execute prep-sources to create Source1
+Source1: %{name}-ui.tar.gz
+
 Packager: Stefano Fancello <stefano.fancello@nethesis.it>
 BuildArch: noarch
 Requires: nethserver-base nethserver-backup-config rsync stunnel nethserver-backup-data
@@ -27,6 +30,13 @@ rm -rf %{buildroot}
 rm -f %{name}-%{version}-%{release}-filelist
 %{genfilelist} %{buildroot} > %{name}-%{version}-%{release}-filelist
 
+#cockpit creation and installation
+mkdir -p %{buildroot}/usr/share/cockpit/%{name}/
+mkdir -p %{buildroot}/usr/share/cockpit/nethserver/applications/
+mkdir -p %{buildroot}/usr/libexec/nethserver/api/%{name}/
+tar xvf %{SOURCE1} -C %{buildroot}/usr/share/cockpit/%{name}/
+cp -a %{name}.json %{buildroot}/usr/share/cockpit/nethserver/applications/
+cp -a api/* %{buildroot}/usr/libexec/nethserver/api/%{name}/
 
 %clean
 rm -rf %{buildroot}
