@@ -57,7 +57,6 @@ else
   # if cat wasn't able to read the file anymore, another instance probably is
   # about to remove the lock -- exit, we're *still* locked
     if [ $? != 0 ]; then
-      echo "hotsync-cron: lock failed, PID ${OTHERPID} is active" >&2
       exit 0
     fi
     if ! kill -0 $OTHERPID &>/dev/null; then
@@ -72,7 +71,6 @@ else
       # if it's still there, it wasn't too old, bail
       if [ -f $LOCKFILE ]; then
         # lock is valid and OTHERPID is active - exit, we're locked!
-        echo "hotsync-cron: lock failed, PID ${OTHERPID} is active" >&2
         exit 0
       else
         # lock was invalid, restart
