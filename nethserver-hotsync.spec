@@ -1,6 +1,6 @@
 Summary: NethServer Enterprise Hotsync 
 Name: nethserver-hotsync
-Version: 2.0.2
+Version: 2.0.3
 Release: 1%{?dist}
 License: Firmware
 Group: System Environment/Base
@@ -38,6 +38,9 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Wed Oct 16 2019 Stefano Fancello <stefano.fancello@nethesis.it> - 2.0.3-1
+- Avoid useless email if scheduled too often
+
 * Fri Mar 23 2018 Davide Principi <davide.principi@nethesis.it> - 2.0.2-1
 - Hotsync does not restore special shared folder ACLs  - Bug NethServer/dev#5433
 
