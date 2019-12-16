@@ -65,6 +65,9 @@
         "status": "Status"
     },
     "docs": {
+      "HotSyncWithSlave": "You can backup master configuration to sync it on slave host",
+      "HotSyncFromMaster": "You can download master configuration on slave host without put this one in production",
+      "Promote": "With this command you can put slave host in production when master host crashes"
     },
     "save": "Save",
     "cancel": "Cancel",

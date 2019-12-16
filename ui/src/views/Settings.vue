@@ -161,6 +161,12 @@
               <div v-if="configuration.role == 'master'" class="form-group">
                 <label class="col-sm-5 control-label">
                   {{$t('settings.hotsync_with_slave')}}
+                  <doc-info
+                    :placement="'top'"
+                    :title="$t('settings.hotsync_with_slave')"
+                    :chapter="'HotSyncWithSlave'"
+                    :inline="true"
+                  ></doc-info>
                 </label>
                 <div class="col-sm-5">
                   <button 
@@ -177,6 +183,12 @@
                 <div class="form-group">
                   <label class="col-sm-5 control-label">
                     {{$t('settings.hotsync_from_master')}}
+                    <doc-info
+                      :placement="'top'"
+                      :title="$t('settings.hotsync_from_master')"
+                      :chapter="'HotSyncFromMaster'"
+                      :inline="true"
+                    ></doc-info>
                   </label>
                   <div class="col-sm-5">
                     <button 
@@ -192,6 +204,12 @@
                 <div class="form-group">
                   <label class="col-sm-5 control-label">
                     {{$t('settings.promote')}}
+                    <doc-info
+                      :placement="'top'"
+                      :title="$t('settings.promote')"
+                      :chapter="'Promote'"
+                      :inline="true"
+                    ></doc-info>
                   </label>
                   <div class="col-sm-5">
                     <button 
