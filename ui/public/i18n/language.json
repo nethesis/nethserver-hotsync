@@ -1,6 +1,20 @@
 {
     "settings": {
-        "title": "Settings"
+        "title": "Settings",
+        "status": "Service enabled",
+        "role": "Machine role",
+        "role_null": "Select a role",
+        "role_master": "Master",
+        "role_slave": "Slave",
+        "not_valid_role_selected": "Select a valid role",
+        "rsyncd_password": "Password",
+        "slave_ip": "Slave IP",
+        "master_ip": "Master IP",
+        "not_valid_ip_address": "Insert a valid IPv4 address",
+        "sync_databases": "Sync databases",
+        "error_reading_hotsync_configuration": "Error while reading HotSync configuration",
+        "settings_updated_ok": "Configuration update successful",
+        "settings_updated_error": "Configuration update failed"
     },
     "about": {
         "title": "About",
@@ -16,7 +30,7 @@
         "filter_label": "Regexp filter"
     },
     "dashboard":{
-        "title": "Hotspot"
+        "title": "Dashboard"
     },
     "docs": {
     },
