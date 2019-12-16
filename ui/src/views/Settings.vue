@@ -13,6 +13,18 @@
 
     <div v-if="!uiLoaded" class="spinner spinner-lg"></div>
     <div v-if="uiLoaded">
+      <div
+        v-show="configuration.runningMaster > 0 || configuration.runningSlave > 0 || configuration.runningPromote > 0"
+        class="alert alert-warning"
+      >
+        <button type="button" class="close">
+          <div class="spinner"></div>
+        </button>
+        <span class="pficon pficon-warning-triangle-o"></span>
+        <strong>{{$t('settings.task_in_progress')}}:</strong>
+        {{configuration.runningMaster > 0 ?
+        $t('settings.master_sync_with_slave') : configuration.runningSlave > 0 ? $t('settings.slave_sync_with_master') : configuration.runningPromote > 0 ? $t('settings.promote_is_running') : ''}}.
+      </div>
       <form class="form-horizontal" v-on:submit.prevent="saveConfig()">
         <div class="row">
           <div class="col-lg-12">
@@ -140,7 +152,94 @@
           </div>
         </div>
       </form>
+
+      <h3>{{$t('settings.actions')}}</h3>
+      <form class="form-horizontal">
+        <div class="row">
+          <div class="col-lg-12">
+            <div class="col-md-6">
+              <div v-if="configuration.role == 'master'" class="form-group">
+                <label class="col-sm-5 control-label">
+                  {{$t('settings.hotsync_with_slave')}}
+                </label>
+                <div class="col-sm-5">
+                  <button 
+                    :disabled="configuration.runningMaster || configuration.status != 'enabled'"
+                    class="btn btn-primary" 
+                    type="button"
+                    @click="hotsync()"
+                  >
+                    {{$t('settings.hotsync')}}
+                  </button>
+                </div>
+              </div>
+              <div v-else-if="configuration.role == 'slave'">
+                <div class="form-group">
+                  <label class="col-sm-5 control-label">
+                    {{$t('settings.hotsync_from_master')}}
+                  </label>
+                  <div class="col-sm-5">
+                    <button 
+                      :disabled="configuration.runningSlave || configuration.runningPromote || configuration.status != 'enabled'"
+                      class="btn btn-primary" 
+                      type="button"
+                      @click="hotsync('-slave')"
+                    >
+                      {{$t('settings.hotsync_slave')}}
+                    </button>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="col-sm-5 control-label">
+                    {{$t('settings.promote')}}
+                  </label>
+                  <div class="col-sm-5">
+                    <button 
+                      :disabled="configuration.runningPromote || configuration.runningSlave || configuration.status != 'enabled'"
+                      class="btn btn-danger" 
+                      type="button"
+                      @click="openPromote()"
+                    >
+                      {{$t('settings.promote_btn')}}
+                    </button>
+                  </div>
+                </div>  
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
     </div>
+    
+    <div class="modal" id="promoteModal" tabindex="-1" role="dialog" data-backdrop="static">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title">
+              {{$t('settings.start_promote_task')}}
+            </h4>
+          </div>
+          <form
+            class="form-horizontal"
+            v-on:submit.prevent="promote()"
+          >
+            <div class="modal-body">
+              <div class="form-group">
+                <label
+                  class="col-sm-3 control-label"
+                  for="textInput-modal-markup"
+                >{{$t('are_you_sure')}}?</label>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button class="btn btn-default" type="button" data-dismiss="modal">{{$t('cancel')}}</button>
+              <button class="btn btn-danger" type="submit">{{$t('settings.promote')}}</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    
   </div>
 </template>
 
@@ -152,7 +251,8 @@ export default {
   props: {
   },
   mounted() {
-    this.getConfig()
+    this.getConfig();
+    this.pollingStatus();
   },
   data() {
     return {
@@ -164,7 +264,10 @@ export default {
         masterIp: null,
         slaveIp: null,
         databases: null,
-        rsyncdPassword: null
+        rsyncdPassword: null,
+        runningMaster: false,
+        runningSlave: false,
+        runningPromote: false
       },
       loaders: false,
       errors: this.initErrors()
@@ -178,9 +281,11 @@ export default {
     closeErrorMessage() {
       this.errorMessage = null;
     },
-    getConfig() {
+    getConfig(type) {
       var context = this;
-      context.uiLoaded = false;
+      if (type != "update") {
+        context.uiLoaded = false;
+      }
       nethserver.exec(
         ["nethserver-hotsync/settings/read"],
         { action: "configuration" },
@@ -194,7 +299,9 @@ export default {
           } catch (e) {
             console.error(e);
           }
-          context.uiLoaded = true;
+          if (type != "update") {
+            context.uiLoaded = true;
+          }
         },
         function(error) {
           context.showErrorMessage(context.$i18n.t("settings.error_reading_hotsync_configuration"), error);
@@ -222,14 +329,7 @@ export default {
         null,
         function(success) {
           context.loaders = false;
-      
-          // notification
-          nethserver.notifications.success = context.$i18n.t(
-            "settings.settings_updated_ok"
-          );
-          nethserver.notifications.error = context.$i18n.t(
-            "settings.settings_updated_error"
-          );
+
           // update values
           nethserver.exec(
             ["nethserver-hotsync/settings/update"],
@@ -239,9 +339,15 @@ export default {
             },
             function(success) {
               context.getConfig();
+              nethserver.notifications.success = context.$i18n.t(
+                "settings.settings_updated_ok"
+              );
             },
             function(error, data) {
               console.error(error, data);
+              nethserver.notifications.error = context.$i18n.t(
+                "settings.settings_updated_error"
+              );
             },
             true //sudo
           );
@@ -279,6 +385,53 @@ export default {
           message: ""
         }
       }
+    },
+    hotsync(type) {
+      var context = this;
+      nethserver.exec(
+        ["nethserver-hotsync/settings/execute"],
+        { action: "hotsync" + type },
+        function(stream) {
+          console.info("hotsync" + type, stream);
+        },
+        function(success) {
+          nethserver.notifications.success = context.$i18n.t(
+            "settings.success_hotsync_command"
+          );
+          context.getConfig('update');
+        },
+        function(error) {
+          context.showErrorMessage(context.$i18n.t("settings.error_hotsync_command"), error);
+        }
+      );
+    },
+    promote() {
+      var context = this;
+      nethserver.exec(
+        ["nethserver-hotsync/settings/execute"],
+        { action: "promote" },
+        function(stream) {
+          console.info("promote", stream);
+        },
+        function(success) {
+          nethserver.notifications.success = context.$i18n.t(
+            "settings.success_promote_command"
+          );
+          context.getConfig('update');
+        },
+        function(error) {
+          context.showErrorMessage(context.$i18n.t("settings.error_promote_command"), error);
+        }
+      );
+    },
+    pollingStatus() {
+      var context = this;
+      context.pollingIntervalId = setInterval(function() {
+        context.getConfig('update');
+      }, 2500);
+    },
+    openPromote() {
+      $('#promoteModal').modal('show');
     }
   }
 };

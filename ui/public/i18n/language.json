@@ -14,7 +14,23 @@
         "sync_databases": "Sync databases",
         "error_reading_hotsync_configuration": "Error while reading HotSync configuration",
         "settings_updated_ok": "Configuration update successful",
-        "settings_updated_error": "Configuration update failed"
+        "settings_updated_error": "Configuration update failed",
+        "actions": "Management",
+        "hotsync_with_slave": "HotSync with slave host",
+        "hotsync": "HotSync",
+        "hotsync_from_master": "HotSync from master host",
+        "hotsync_slave": "HotSync slave",
+        "promote": "Promote as master",
+        "promote_btn": "Promote",
+        "task_in_progress": "Task in progress",
+        "master_sync_with_slave": "Master machine is synchronizing with slave",
+        "slave_sync_with_master": "Slave machine is synchronizing with master",
+        "promote_is_running": "A promotion task is running",
+        "error_hotsync_command": "Error while execuiting HotSync command",
+        "error_promote_command": "Error while execuiting promote command",
+        "success_hotsync_command": "HotSync command successful",
+        "success_promote_command": "Promote command successful",
+        "start_promote_task": "Start promotion task"
     },
     "about": {
         "title": "About",
@@ -57,5 +73,6 @@
     "of": "of",
     "rows_per_page": "Rows per page",
     "search": "Search",
-    "all": "All"
+    "all": "All",
+    "are_you_sure": "Are you sure"
 } 
