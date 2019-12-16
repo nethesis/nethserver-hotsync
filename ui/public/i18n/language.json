@@ -30,7 +30,23 @@
         "filter_label": "Regexp filter"
     },
     "dashboard":{
-        "title": "Dashboard"
+        "title": "Dashboard",
+        "error_reading_hotsync_configuration": "Error while reading HotSync configuration",
+        "hotsync_configuration": "HotSync configuration",
+        "hotsync_status": "HotSync status",
+        "hotsync_role": "Role",
+        "hotsync_slave_host": "Slave host",
+        "hotsync_slave_port": "Slave port",
+        "hotsync_sync_databases": "Sync databases",
+        "enabled": "Enabled",
+        "disabled": "Disabled",
+        "hotsync_master_host": "Master host",
+        "rsyncd_configuration": "Rsyncd configuration",
+        "rsyncd_status": "Rsyncd status",
+        "rsyncd_port": "Port",
+        "rsyncd_password": "Password",
+        "role_not_configured": "Role not configured",
+        "status": "Status"
     },
     "docs": {
     },

@@ -163,7 +163,7 @@ export default {
         role: null,
         masterIp: null,
         slaveIp: null,
-        databases: 'enabled',
+        databases: null,
         rsyncdPassword: null
       },
       loaders: false,
