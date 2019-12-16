@@ -63,7 +63,7 @@
                     >
                   </div>
                 </div>
-                <div :class="['form-group', errors.masterIp.hasError ? 'has-error' : '']">
+                <div :class="['form-group', errors.slaveIp.hasError ? 'has-error' : '']">
                   <label class="col-sm-5 control-label">
                     {{$t('settings.slave_ip')}}
                   </label>
