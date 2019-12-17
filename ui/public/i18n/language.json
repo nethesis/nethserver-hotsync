@@ -15,7 +15,7 @@
         "error_reading_hotsync_configuration": "Error while reading HotSync configuration",
         "settings_updated_ok": "Configuration update successful",
         "settings_updated_error": "Configuration update failed",
-        "actions": "Management",
+        "actions": "Actions",
         "hotsync_with_slave": "HotSync with slave host",
         "hotsync": "HotSync",
         "hotsync_from_master": "HotSync from master host",
