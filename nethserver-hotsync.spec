@@ -1,11 +1,10 @@
-Summary: NethServer Enterprise Hotsync 
+Summary: NethServer Hotsync 
 Name: nethserver-hotsync
 Version: 2.0.3
 Release: 1%{?dist}
-License: Firmware
-Group: System Environment/Base
+License: GPLv3
 Source0: %{name}-%{version}.tar.gz
-Packager: Stefano Fancello <stefano.fancello@nethesis.it>
+Source1: %{name}-cockpit.tar.gz
 BuildArch: noarch
 Requires: nethserver-base nethserver-backup-config rsync stunnel nethserver-backup-data
 URL: %{url_prefix}/%{name}
@@ -20,10 +19,19 @@ NethServer Hotsync is a tool that simplifies configuration of rsync to keep two 
 
 %build
 perl createlinks
+sed -i 's/_RELEASE_/%{version}/' %{name}.json
 
 %install
 rm -rf %{buildroot}
 (cd root ; find . -depth -print | cpio -dump %{buildroot})
+
+mkdir -p %{buildroot}/usr/share/cockpit/%{name}/
+mkdir -p %{buildroot}/usr/share/cockpit/nethserver/applications/
+mkdir -p %{buildroot}/usr/libexec/nethserver/api/%{name}/
+tar xvf %{SOURCE1} -C %{buildroot}/usr/share/cockpit/%{name}/
+cp -a %{name}.json %{buildroot}/usr/share/cockpit/nethserver/applications/
+cp -a api/* %{buildroot}/usr/libexec/nethserver/api/%{name}/
+
 rm -f %{name}-%{version}-%{release}-filelist
 %{genfilelist} %{buildroot} > %{name}-%{version}-%{release}-filelist
 
@@ -35,6 +43,7 @@ rm -rf %{buildroot}
 %defattr(-,root,root)
 %dir %{_nseventsdir}/%{name}-update
 %doc README.rst
+%attr(0440,root,root) /etc/sudoers.d/50_nsapi_nethserver_hotsync
 
 
 %changelog

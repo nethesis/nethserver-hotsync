@@ -7,7 +7,7 @@ branches:
         - master
 env:
    global:
-    - DEST_ID=core
+    - DEST_ID=forge
     - NSVER=7
     - DOCKER_IMAGE=nethserver/makerpms:${NSVER}
     - >
@@ -22,8 +22,11 @@ env:
         -e NSVER
         -e VERSIONS_PACK
         -e STAGES_PACK
-        -e UPLOAD_DEST
+        -e ENDPOINTS_PACK
         "
+
+install:
+- ./prep-sources
 
 script: >
     docker run -ti --name makerpms ${EVARS}

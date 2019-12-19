@@ -1,0 +1,23 @@
+{
+    "id": "nethserver-hotsync",
+    "name": "HotSync",
+    "summary": "Nethserver HotSync",
+    "description": "Nethserver HotSync",
+    "url": "",
+    "homepage": "https://github.com/NethServer/nethserver-hotsync",
+    "provides": ["nethserver-hotsync"],
+    "release": {
+        "version": "_RELEASE_"
+    },
+    "tags": ["hotsync", "nethserver"],
+    "license": "GPL-3.0",
+    "bugs": {
+        "url": "https://github.com/NethServer/dev/issues"
+    },
+    "author": {
+        "name": "Giacomo Sanchietti, Federico Ballarini",
+        "url": "https://github.com/NethServer/nethserver-hotsync",
+        "email": "giacomo.sanchietti@nethesis.it, fed.ballarini@gmail.com"
+    },
+    "icon": "logo.png"
+} 

@@ -1,0 +1,59 @@
+#!/usr/bin/perl
+
+#
+# Copyright (C) 2019 Nethesis S.r.l.
+# http://www.nethesis.it - nethserver@nethesis.it
+#
+# This script is part of NethServer.
+#
+# NethServer is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License,
+# or any later version.
+#
+# NethServer is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with NethServer.  If not, see COPYING.
+#
+
+use strict;
+use warnings;
+use esmith::ConfigDB;
+use JSON;
+
+require '/usr/libexec/nethserver/api/lib/helper_functions.pl';
+
+my $input = readInput();
+my $cmd = $input->{'action'};
+
+my $ret = {};
+
+
+if ($cmd eq 'configuration') {
+
+    my $db = esmith::ConfigDB->open_ro();
+    $ret->{'configuration'}{'status'} = $db->get_prop('hotsync', 'status') || 'disabled';
+    $ret->{'configuration'}{'role'} = $db->get_prop('hotsync', 'role') || 'null';
+    $ret->{'configuration'}{'rsyncdPassword'} = $db->get_prop('rsyncd', 'password');
+    $ret->{'configuration'}{'slaveIp'} = $db->get_prop('hotsync', 'SlaveHost');
+    $ret->{'configuration'}{'masterIp'} = $db->get_prop('hotsync', 'MasterHost');
+    $ret->{'configuration'}{'databases'} = $db->get_prop('hotsync', 'databases') || 'enabled';
+    
+    my $out = `systemctl is-active hotsync`;
+    $ret->{'configuration'}{'runningMaster'} = ($? == 0)? 1 : 0;
+    
+    $out = `systemctl is-active hotsync-slave`;
+    $ret->{'configuration'}{'runningSlave'} = ($? == 0)? 1 : 0;
+    
+    $out = `systemctl is-active hotsync-promote`;
+    $ret->{'configuration'}{'runningPromote'} = ($? == 0)? 1 : 0;
+    
+} else {
+    error();
+}
+
+print encode_json($ret);
