@@ -1,0 +1,11 @@
+#
+# nsapi_nethserver_freepbx
+#
+Cmnd_Alias NSAPI_NETHSERVER_HOTSYNC = \
+    /usr/libexec/nethserver/api/nethserver-hotsync/dashboard/read, \
+    /usr/libexec/nethserver/api/nethserver-hotsync/settings/read, \
+    /usr/libexec/nethserver/api/nethserver-hotsync/settings/update, \
+    /usr/libexec/nethserver/api/nethserver-hotsync/settings/validate, \
+    /usr/libexec/nethserver/api/nethserver-hotsync/settings/execute
+
+Defaults!NSAPI_NETHSERVER_HOTSYNC !requiretty

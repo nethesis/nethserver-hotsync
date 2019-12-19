@@ -43,6 +43,7 @@ rm -rf %{buildroot}
 %defattr(-,root,root)
 %dir %{_nseventsdir}/%{name}-update
 %doc README.rst
+%attr(0440,root,root) /etc/sudoers.d/50_nsapi_nethserver_hotsync
 
 
 %changelog
