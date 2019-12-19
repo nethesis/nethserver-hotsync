@@ -2,11 +2,9 @@ Summary: NethServer Hotsync
 Name: nethserver-hotsync
 Version: 2.0.3
 Release: 1%{?dist}
-License: Firmware
-Group: System Environment/Base
+License: GPLv3
 Source0: %{name}-%{version}.tar.gz
 Source1: %{name}-cockpit.tar.gz
-Packager: Stefano Fancello <stefano.fancello@nethesis.it>
 BuildArch: noarch
 Requires: nethserver-base nethserver-backup-config rsync stunnel nethserver-backup-data
 URL: %{url_prefix}/%{name}
