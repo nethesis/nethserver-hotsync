@@ -1,5 +1,5 @@
 #
-# nsapi_nethserver_freepbx
+# nsapi_nethserver_hotsync
 #
 Cmnd_Alias NSAPI_NETHSERVER_HOTSYNC = \
     /usr/libexec/nethserver/api/nethserver-hotsync/dashboard/read, \
