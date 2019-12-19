@@ -15,9 +15,9 @@
         "url": "https://github.com/NethServer/dev/issues"
     },
     "author": {
-        "name": "Autore",
+        "name": "Giacomo Sanchietti, Federico Ballarini",
         "url": "https://github.com/NethServer/nethserver-hotsync",
-        "email": "autore@nethesis.it"
+        "email": "giacomo.sanchietti@nethesis.it, fed.ballarini@gmail.com"
     },
     "icon": "logo.png"
 } 
