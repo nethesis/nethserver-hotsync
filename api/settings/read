@@ -43,14 +43,16 @@ if ($cmd eq 'configuration') {
     $ret->{'configuration'}{'masterIp'} = $db->get_prop('hotsync', 'MasterHost');
     $ret->{'configuration'}{'databases'} = $db->get_prop('hotsync', 'databases') || 'enabled';
     
+} elsif ($cmd eq 'hotsync-status') {
+    
     my $out = `systemctl is-active hotsync`;
-    $ret->{'configuration'}{'runningMaster'} = ($? == 0)? 1 : 0;
+    $ret->{'status'}{'runningMaster'} = ($? == 0)? 1 : 0;
     
     $out = `systemctl is-active hotsync-slave`;
-    $ret->{'configuration'}{'runningSlave'} = ($? == 0)? 1 : 0;
+    $ret->{'status'}{'runningSlave'} = ($? == 0)? 1 : 0;
     
     $out = `systemctl is-active hotsync-promote`;
-    $ret->{'configuration'}{'runningPromote'} = ($? == 0)? 1 : 0;
+    $ret->{'status'}{'runningPromote'} = ($? == 0)? 1 : 0;
     
 } else {
     error();

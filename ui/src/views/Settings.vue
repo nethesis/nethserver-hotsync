@@ -14,7 +14,7 @@
     <div v-if="!uiLoaded" class="spinner spinner-lg"></div>
     <div v-if="uiLoaded">
       <div
-        v-show="configuration.runningMaster > 0 || configuration.runningSlave > 0 || configuration.runningPromote > 0"
+        v-show="status.runningMaster > 0 || status.runningSlave > 0 || status.runningPromote > 0"
         class="alert alert-warning"
       >
         <button type="button" class="close">
@@ -22,8 +22,8 @@
         </button>
         <span class="pficon pficon-warning-triangle-o"></span>
         <strong>{{$t('settings.task_in_progress')}}:</strong>
-        {{configuration.runningMaster > 0 ?
-        $t('settings.master_sync_with_slave') : configuration.runningSlave > 0 ? $t('settings.slave_sync_with_master') : configuration.runningPromote > 0 ? $t('settings.promote_is_running') : ''}}.
+        {{status.runningMaster > 0 ?
+        $t('settings.master_sync_with_slave') : status.runningSlave > 0 ? $t('settings.slave_sync_with_master') : status.runningPromote > 0 ? $t('settings.promote_is_running') : ''}}.
       </div>
       <form class="form-horizontal" v-on:submit.prevent="saveConfig()">
         <div class="row">
@@ -170,7 +170,7 @@
                 </label>
                 <div class="col-sm-5">
                   <button 
-                    :disabled="configuration.runningMaster || configuration.status != 'enabled'"
+                    :disabled="status.runningMaster || configuration.status != 'enabled'"
                     class="btn btn-primary" 
                     type="button"
                     @click="hotsync()"
@@ -192,7 +192,7 @@
                   </label>
                   <div class="col-sm-5">
                     <button 
-                      :disabled="configuration.runningSlave || configuration.runningPromote || configuration.status != 'enabled'"
+                      :disabled="status.runningSlave || status.runningPromote || configuration.status != 'enabled'"
                       class="btn btn-primary" 
                       type="button"
                       @click="hotsync('-slave')"
@@ -213,7 +213,7 @@
                   </label>
                   <div class="col-sm-5">
                     <button 
-                      :disabled="configuration.runningPromote || configuration.runningSlave || configuration.status != 'enabled'"
+                      :disabled="status.runningPromote || status.runningSlave || configuration.status != 'enabled'"
                       class="btn btn-danger" 
                       type="button"
                       @click="openPromote()"
@@ -270,6 +270,7 @@ export default {
   },
   mounted() {
     this.getConfig();
+    this.getHotsyncStatus();
     this.pollingStatus();
   },
   data() {
@@ -282,7 +283,9 @@ export default {
         masterIp: null,
         slaveIp: null,
         databases: null,
-        rsyncdPassword: null,
+        rsyncdPassword: null
+      },
+      status: {
         runningMaster: false,
         runningSlave: false,
         runningPromote: false
@@ -299,11 +302,9 @@ export default {
     closeErrorMessage() {
       this.errorMessage = null;
     },
-    getConfig(type) {
+    getConfig() {
       var context = this;
-      if (type != "update") {
-        context.uiLoaded = false;
-      }
+      context.uiLoaded = false;
       nethserver.exec(
         ["nethserver-hotsync/settings/read"],
         { action: "configuration" },
@@ -317,12 +318,28 @@ export default {
           } catch (e) {
             console.error(e);
           }
-          if (type != "update") {
-            context.uiLoaded = true;
-          }
+          context.uiLoaded = true;
         },
         function(error) {
           context.showErrorMessage(context.$i18n.t("settings.error_reading_hotsync_configuration"), error);
+        }
+      );
+    },
+    getHotsyncStatus() {
+      var context = this;
+      nethserver.exec(
+        ["nethserver-hotsync/settings/read"],
+        { action: "hotsync-status" },
+        null,
+        function(success) {
+          try {
+            context.status = JSON.parse(success).status;
+          } catch (e) {
+            console.error(e);
+          }
+        },
+        function(error) {
+          context.showErrorMessage(context.$i18n.t("settings.error_reading_hotsync_status"), error);
         }
       );
     },
@@ -347,7 +364,15 @@ export default {
         null,
         function(success) {
           context.loaders = false;
-
+          
+          nethserver.notifications.success = context.$i18n.t(
+            "settings.settings_updated_ok"
+          );
+          
+          nethserver.notifications.error = context.$i18n.t(
+            "settings.settings_updated_error"
+          );
+              
           // update values
           nethserver.exec(
             ["nethserver-hotsync/settings/update"],
@@ -357,15 +382,9 @@ export default {
             },
             function(success) {
               context.getConfig();
-              nethserver.notifications.success = context.$i18n.t(
-                "settings.settings_updated_ok"
-              );
             },
             function(error, data) {
               console.error(error, data);
-              nethserver.notifications.error = context.$i18n.t(
-                "settings.settings_updated_error"
-              );
             },
             true //sudo
           );
@@ -416,7 +435,7 @@ export default {
           nethserver.notifications.success = context.$i18n.t(
             "settings.success_hotsync_command"
           );
-          context.getConfig('update');
+          context.getHotsyncStatus();
         },
         function(error) {
           context.showErrorMessage(context.$i18n.t("settings.error_hotsync_command"), error);
@@ -435,7 +454,7 @@ export default {
           nethserver.notifications.success = context.$i18n.t(
             "settings.success_promote_command"
           );
-          context.getConfig('update');
+          context.getHotsyncStatus();
         },
         function(error) {
           context.showErrorMessage(context.$i18n.t("settings.error_promote_command"), error);
@@ -445,7 +464,7 @@ export default {
     pollingStatus() {
       var context = this;
       context.pollingIntervalId = setInterval(function() {
-        context.getConfig('update');
+        context.getHotsyncStatus();
       }, 2500);
     },
     openPromote() {
