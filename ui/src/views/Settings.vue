@@ -173,7 +173,7 @@
                     :disabled="status.runningMaster || configuration.status != 'enabled'"
                     class="btn btn-primary" 
                     type="button"
-                    @click="hotsync()"
+                    @click="hotsync('')"
                   >
                     {{$t('settings.hotsync')}}
                   </button>
