@@ -51,9 +51,6 @@ if ($cmd eq 'configuration') {
     $out = `systemctl is-active hotsync-slave`;
     $ret->{'status'}{'runningSlave'} = ($? == 0)? 1 : 0;
     
-    $out = `systemctl is-active hotsync-promote`;
-    $ret->{'status'}{'runningPromote'} = ($? == 0)? 1 : 0;
-    
 } else {
     error();
 }

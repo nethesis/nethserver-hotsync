@@ -21,17 +21,11 @@
         "hotsync": "HotSync",
         "hotsync_from_master": "HotSync from master host",
         "hotsync_slave": "HotSync slave",
-        "promote": "Promote as master",
-        "promote_btn": "Promote",
         "task_in_progress": "Task in progress",
         "master_sync_with_slave": "Master machine is synchronizing with slave",
         "slave_sync_with_master": "Slave machine is synchronizing with master",
-        "promote_is_running": "A promotion task is running",
         "error_hotsync_command": "Error while execuiting HotSync command",
-        "error_promote_command": "Error while execuiting promote command",
-        "success_hotsync_command": "HotSync command successful",
-        "success_promote_command": "Promote command successful",
-        "start_promote_task": "Start promotion task"
+        "success_hotsync_command": "HotSync command successful"
     },
     "about": {
         "title": "About",
@@ -67,9 +61,8 @@
         "status": "Status"
     },
     "docs": {
-      "HotSyncWithSlave": "You can backup master configuration to sync it on slave host",
-      "HotSyncFromMaster": "You can download master configuration on slave host without put this one in production",
-      "Promote": "With this command you can put slave host in production when master host crashes"
+      "HotSyncWithSlave": "You can backup master configuration to sync it on slave host.",
+      "HotSyncFromMaster": "You can download master configuration on slave host without put this one in production. To put this in production refer to online docs and launch promote command from CLI."
     },
     "save": "Save",
     "cancel": "Cancel",
