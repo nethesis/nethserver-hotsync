@@ -14,7 +14,7 @@
     <div v-if="!uiLoaded" class="spinner spinner-lg"></div>
     <div v-if="uiLoaded">
       <div
-        v-show="status.runningMaster > 0 || status.runningSlave > 0 || status.runningPromote > 0"
+        v-show="status.runningMaster > 0 || status.runningSlave > 0"
         class="alert alert-warning"
       >
         <button type="button" class="close">
@@ -23,7 +23,7 @@
         <span class="pficon pficon-warning-triangle-o"></span>
         <strong>{{$t('settings.task_in_progress')}}:</strong>
         {{status.runningMaster > 0 ?
-        $t('settings.master_sync_with_slave') : status.runningSlave > 0 ? $t('settings.slave_sync_with_master') : status.runningPromote > 0 ? $t('settings.promote_is_running') : ''}}.
+        $t('settings.master_sync_with_slave') : status.runningSlave > 0 ? $t('settings.slave_sync_with_master') : ''}}.
       </div>
       <form class="form-horizontal" v-on:submit.prevent="saveConfig()">
         <div class="row">
@@ -192,7 +192,7 @@
                   </label>
                   <div class="col-sm-5">
                     <button 
-                      :disabled="status.runningSlave || status.runningPromote || configuration.status != 'enabled'"
+                      :disabled="status.runningSlave || configuration.status != 'enabled'"
                       class="btn btn-primary" 
                       type="button"
                       @click="hotsync('-slave')"
@@ -201,63 +201,13 @@
                     </button>
                   </div>
                 </div>
-                <div class="form-group">
-                  <label class="col-sm-5 control-label">
-                    {{$t('settings.promote')}}
-                    <doc-info
-                      :placement="'top'"
-                      :title="$t('settings.promote')"
-                      :chapter="'Promote'"
-                      :inline="true"
-                    ></doc-info>
-                  </label>
-                  <div class="col-sm-5">
-                    <button 
-                      :disabled="status.runningPromote || status.runningSlave || configuration.status != 'enabled'"
-                      class="btn btn-danger" 
-                      type="button"
-                      @click="openPromote()"
-                    >
-                      {{$t('settings.promote_btn')}}
-                    </button>
-                  </div>
-                </div>  
               </div>
             </div>
           </div>
         </div>
       </form>
     </div>
-    
-    <div class="modal" id="promoteModal" tabindex="-1" role="dialog" data-backdrop="static">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h4 class="modal-title">
-              {{$t('settings.start_promote_task')}}
-            </h4>
-          </div>
-          <form
-            class="form-horizontal"
-            v-on:submit.prevent="promote()"
-          >
-            <div class="modal-body">
-              <div class="form-group">
-                <label
-                  class="col-sm-3 control-label"
-                  for="textInput-modal-markup"
-                >{{$t('are_you_sure')}}?</label>
-              </div>
-            </div>
-            <div class="modal-footer">
-              <button class="btn btn-default" type="button" data-dismiss="modal">{{$t('cancel')}}</button>
-              <button class="btn btn-danger" type="submit">{{$t('settings.promote')}}</button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
-    
+        
   </div>
 </template>
 
@@ -287,8 +237,7 @@ export default {
       },
       status: {
         runningMaster: false,
-        runningSlave: false,
-        runningPromote: false
+        runningSlave: false
       },
       loaders: false,
       errors: this.initErrors()
@@ -442,33 +391,11 @@ export default {
         }
       );
     },
-    promote() {
-      var context = this;
-      nethserver.exec(
-        ["nethserver-hotsync/settings/execute"],
-        { action: "promote" },
-        function(stream) {
-          console.info("promote", stream);
-        },
-        function(success) {
-          nethserver.notifications.success = context.$i18n.t(
-            "settings.success_promote_command"
-          );
-          context.getHotsyncStatus();
-        },
-        function(error) {
-          context.showErrorMessage(context.$i18n.t("settings.error_promote_command"), error);
-        }
-      );
-    },
     pollingStatus() {
       var context = this;
       context.pollingIntervalId = setInterval(function() {
         context.getHotsyncStatus();
       }, 2500);
-    },
-    openPromote() {
-      $('#promoteModal').modal('show');
     }
   }
 };
