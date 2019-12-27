@@ -28,6 +28,9 @@ if [[ $ROLE != 'slave' ]]; then
     exit 1
 fi
 
+# launch hotsync-slave to fix permissions before restore
+/usr/sbin/hotsync-slave
+
 # Enable NethServer events after yum
 sed -i 's/enabled = 0/enabled = 1/g' /etc/yum/pluginconf.d/nethserver_events.conf
 
