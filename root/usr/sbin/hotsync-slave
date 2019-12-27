@@ -59,6 +59,8 @@ if rpm -q --quiet nethserver-openvpn; then
   chown -R srvmgr:adm /var/lib/nethserver/openvpn-tunnels/
 fi
 
-chown -R vmail:vmail /var/lib/nethserver/vmail/
+if rpm -q --quiet nethserver-mail-server; then
+  chown -R vmail:vmail /var/lib/nethserver/vmail/
+fi
 
 exit ${exit_code}
