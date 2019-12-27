@@ -33,4 +33,8 @@ if rpm -q --quiet nethserver-dc; then
     if [[ -d "/var/lib/machines/nsdc" ]]; then
         echo "/var/lib/machines/nsdc" >> ${INCLUDE_FILE}
     fi
+    # check if nsdc is enabled
+    if [[ -d "/etc/systemd/system/machines.target.wants" ]]; then
+        echo "/etc/systemd/system/machines.target.wants" >> ${INCLUDE_FILE}
+    fi
 fi
