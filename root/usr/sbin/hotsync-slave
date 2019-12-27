@@ -39,4 +39,26 @@ if [[ $? == 0 ]]; then
     /etc/e-smith/events/actions/nethserver-backup-config-push2history || ((++exit_code))
 fi
 
+# fix permissions
+if rpm -q --quiet nethserver-freepbx; then
+  chown asterisk:asterisk /etc/freepbx.conf
+  chown -R asterisk:asterisk /var/lib/asterisk/
+  chown -R asterisk:asterisk /var/www/html/freepbx/
+fi
+
+if rpm -q --quiet nethserver-mail-filter; then
+  chown -R redis:redis /var/lib/redis/
+  chown -R _rspamd:_rspamd /var/lib/rspamd/
+fi
+
+if rpm -q --quiet nethserver-ejabberd; then
+  chown -R ejabberd:ejabberd /var/lib/nethserver/ejabberd/
+fi
+
+if rpm -q --quiet nethserver-openvpn; then
+  chown -R srvmgr:adm /var/lib/nethserver/openvpn-tunnels/
+fi
+
+chown -R vmail:vmail /var/lib/nethserver/vmail/
+
 exit ${exit_code}
