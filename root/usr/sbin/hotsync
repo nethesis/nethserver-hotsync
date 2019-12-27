@@ -104,6 +104,9 @@ echo "/var/lib/nethserver/backup/" >> ${EXCLUDE_FILE}
 #exclude nethserver db dir: it's already in configuration backup
 echo "/var/lib/nethserver/db/" >> ${EXCLUDE_FILE}
 
+#exclude logs sync
+echo "/var/log/" >> ${EXCLUDE_FILE}
+
 #copy backup config file
 echo "/var/lib/nethserver/backup/backup-config.tar.xz" >> ${INCLUDE_FILE}
 echo "/var/lib/nethserver/backup/backup-config.tar.xz-content.md5" >> ${INCLUDE_FILE}
