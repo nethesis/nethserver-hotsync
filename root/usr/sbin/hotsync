@@ -88,15 +88,15 @@ EXCLUDE_FILE=$(mktemp) || (echo "ERROR! fail creating temporary exclude file"  >
 #trap
 trap "{ rm -f $LOCKFILE; rmdir $LOCKDIR 2>/dev/null; /bin/rm -f ${INCLUDE_FILE} ${EXCLUDE_FILE}; }" INT TERM EXIT
 
+#add default backup data files
+[ -d /etc/backup-data.d ] && (cat /etc/backup-data.d/*.include >> ${INCLUDE_FILE} ;  cat /etc/backup-data.d/*.exclude >> ${EXCLUDE_FILE})
+
 #execute custom scripts. Every executable in /etc/hotsync.d is executed. INCLUDE_FILE and EXCLUDE_FILE are passed as arguments.
 if [[ -d /etc/hotsync.d ]]; then
     for SCRIPT in $(/usr/bin/find /etc/hotsync.d -type f -executable); do
         ${SCRIPT} ${INCLUDE_FILE} ${EXCLUDE_FILE}
     done
 fi
-
-#add default backup data files
-[ -d /etc/backup-data.d ] && (cat /etc/backup-data.d/*.include >> ${INCLUDE_FILE} ;  cat /etc/backup-data.d/*.exclude >> ${EXCLUDE_FILE})
 
 #exclude backup directory 
 echo "/var/lib/nethserver/backup/" >> ${EXCLUDE_FILE}
