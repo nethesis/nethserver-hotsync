@@ -42,6 +42,8 @@ fi
 # fix permissions
 if rpm -q --quiet nethserver-freepbx; then
   chown asterisk:asterisk /etc/freepbx.conf
+  chown asterisk:asterisk /etc/amportal.conf
+  chown -R asterisk:asterisk /etc/asterisk/
   chown -R asterisk:asterisk /var/lib/asterisk/
   chown -R asterisk:asterisk /var/www/html/freepbx/
 fi

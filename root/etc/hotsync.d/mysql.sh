@@ -31,8 +31,10 @@ if rpm -q --quiet nethserver-mysql; then
     if [[ $DATABASES != 'disabled' ]]; then
         # dump mysql tables
         /etc/e-smith/events/actions/mysql-dump-tables
-        #include mysql backup
+        # include mysql backup
         echo "/var/lib/nethserver/backup/mysql/" >> ${INCLUDE_FILE}
+        # copy mysql tables to allow correct applications restore
+        echo "/var/lib/mysql/mysql/" >> ${INCLUDE_FILE}
     fi
 fi
 
