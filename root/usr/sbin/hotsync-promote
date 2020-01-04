@@ -31,6 +31,20 @@ fi
 # launch hotsync-slave to fix permissions before restore
 /usr/sbin/hotsync-slave
 
+if [[ $DATABASES != 'disabled' ]]; then
+  # restore mysql database and restart mysqld service to allow correct applications restore
+  if rpm -q --quiet nethserver-mysql; then
+      systemctl stop mysqld.service
+      systemctl start mysqld.service
+  fi
+  
+  # restore asterisk mysql database before restore-config to avoid errors
+  if rpm -q --quiet nethserver-freepbx; then
+      /usr/bin/mysql < /var/lib/nethserver/backup/mysql/asterisk.dump && /bin/rm /var/lib/nethserver/backup/mysql/asterisk.dump
+      /usr/bin/mysql < /var/lib/nethserver/backup/mysql/asteriskcdrdb.dump && /bin/rm /var/lib/nethserver/backup/mysql/asteriskcdrdb.dump
+  fi
+fi
+
 # Enable NethServer events after yum
 sed -i 's/enabled = 0/enabled = 1/g' /etc/yum/pluginconf.d/nethserver_events.conf
 

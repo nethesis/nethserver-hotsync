@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #
-# Copyright (C) 2017 Nethesis S.r.l.
+# Copyright (C) 2020 Nethesis S.r.l.
 # http://www.nethesis.it - nethserver@nethesis.it
 #
 # This script is part of NethServer.
@@ -26,14 +26,25 @@
 INCLUDE_FILE=$1
 EXCLUDE_FILE=$2
 
-#freepbx hotsync
+# freepbx hotsync
 if rpm -q --quiet nethserver-freepbx; then
-    #include freepbx conf and interface
+    # include freepbx conf and interface
+    echo "/var/lib/asterisk/" >> ${INCLUDE_FILE}
     echo "/var/www/html/freepbx/" >> ${INCLUDE_FILE}
+    echo "/etc/amportal.conf" >> ${INCLUDE_FILE}
+    echo "/etc/asterisk/manager.conf" >> ${INCLUDE_FILE}
     echo "/etc/freepbx.conf" >> ${INCLUDE_FILE}
+    echo "/usr/sbin/fwconsole" >> ${INCLUDE_FILE}
     
-    #remove excluded freepbx files
+    # remove excluded freepbx files
     sed -i 's#/var/www/html/freepbx/##g' ${EXCLUDE_FILE}
     sed -i 's#/var/www/html/freepbx##g' ${EXCLUDE_FILE}
     
+    # remove asterisk db from default exclusions: we need a first restore to avoid errors
+    sed -i 's#/var/lib/nethserver/backup/mysql/asterisk.dump##g' ${EXCLUDE_FILE}
+    
+    # show alert if databases sync is disabled
+    if [[ $DATABASES != 'enabled' ]]; then
+        echo "[WARNING] Databases sync is disabled: asterisk may not work properly after promote. Please enable it."
+    fi  
 fi
