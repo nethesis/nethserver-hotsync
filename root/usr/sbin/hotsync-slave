@@ -63,6 +63,15 @@ fi
 
 if rpm -q --quiet nethserver-mail-server; then
   chown -R vmail:vmail /var/lib/nethserver/vmail/
+  chown root:vmail /var/lib/nethserver/sieve-scripts/
+  chown vmail:vmail /var/lib/nethserver/sieve-scripts/*.svbin
+fi
+
+if rpm -q --quiet nethserver-squidguard; then
+  chown -R squid:squid /var/squidGuard/blacklists/
+  chown -R ufdb:squid /var/squidGuard/blacklists/cache.execlists/
+  chown -R ufdb:ufdb /var/ufdbguard/blacklists/
+  chown -R ufdb:ufdb /var/ufdbguard/logs/
 fi
 
 exit ${exit_code}
