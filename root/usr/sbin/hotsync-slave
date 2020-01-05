@@ -20,23 +20,32 @@
 #
 # Install on spare server same packages installed on master
 
-# Extract package file list
-/bin/tar -xf /var/lib/nethserver/backup/backup-config.tar.xz -C / var/lib/nethserver/backup/package-list --warning=no-timestamp
+if [[ "$1" != "fixperm" ]]; then
+    # Extract package file list
+    /bin/tar -xf /var/lib/nethserver/backup/backup-config.tar.xz -C / var/lib/nethserver/backup/package-list --warning=no-timestamp
 
-# launch reinstall action
-/etc/e-smith/events/actions/restore-config-reinstall
+    # check internet connection before proceed with packages download
+    echo -e "GET http://mirrorlist.nethserver.org HTTP/1.0\n\n" | nc mirrorlist.nethserver.org 80 > /dev/null 2>&1
 
-if [[ $? != 0 ]]; then
-    echo "[ERROR] restore-config-reinstall failed!" 1>&2
-    ((++exit_code))
-fi
+    if [ $? -eq 0 ]; then
+        # launch reinstall action
+        /etc/e-smith/events/actions/restore-config-reinstall
 
-# load configuration backup on interface if its md5 is equal to its md5file
-backupfile="/var/lib/nethserver/backup/backup-config.tar.xz"
-md5file="${backupfile}.md5"
-md5sum ${backupfile} 2>/dev/null | grep -q $(cut -f 1 -d ' ' "${md5file}")
-if [[ $? == 0 ]]; then
-    /etc/e-smith/events/actions/nethserver-backup-config-push2history || ((++exit_code))
+        if [[ $? != 0 ]]; then
+            echo "[ERROR] restore-config-reinstall failed!" 1>&2
+            ((++exit_code))
+        fi
+    else
+        echo "[WARNING] Cannot download packages. Please check your internet connection."
+    fi
+
+    # load configuration backup on interface if its md5 is equal to its md5file
+    backupfile="/var/lib/nethserver/backup/backup-config.tar.xz"
+    md5file="${backupfile}.md5"
+    md5sum ${backupfile} 2>/dev/null | grep -q $(cut -f 1 -d ' ' "${md5file}")
+    if [[ $? == 0 ]]; then
+        /etc/e-smith/events/actions/nethserver-backup-config-push2history || ((++exit_code))
+    fi
 fi
 
 # fix permissions
