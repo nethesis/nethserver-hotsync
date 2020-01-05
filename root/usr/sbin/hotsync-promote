@@ -29,7 +29,7 @@ if [[ $ROLE != 'slave' ]]; then
 fi
 
 # launch hotsync-slave to fix permissions before restore
-/usr/sbin/hotsync-slave
+/usr/sbin/hotsync-slave fixperm
 
 if [[ $DATABASES != 'disabled' ]]; then
   # restore mysql database and restart mysqld service to allow correct applications restore
