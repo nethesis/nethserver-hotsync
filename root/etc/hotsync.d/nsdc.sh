@@ -34,11 +34,11 @@ if rpm -q --quiet nethserver-dc; then
         echo "/var/lib/machines/nsdc" >> ${INCLUDE_FILE}
     fi
     # sync nsdc status
-    if [[ -d "/etc/systemd/system/machines.target.wants" ]]; then
-        echo "/etc/systemd/system/machines.target.wants" >> ${INCLUDE_FILE}
+    if [[ -e "/etc/systemd/system/machines.target.wants/nsdc.service" ]]; then
+        echo "/etc/systemd/system/machines.target.wants/nsdc.service" >> ${INCLUDE_FILE}
     fi
     # sync machines.target status
-    if [[ -d "/etc/systemd/system/multi-user.target.wants" ]]; then
-        echo "/etc/systemd/system/multi-user.target.wants" >> ${INCLUDE_FILE}
+    if [[ -e "/etc/systemd/system/multi-user.target.wants/machines.target" ]]; then
+        echo "/etc/systemd/system/multi-user.target.wants/machines.target" >> ${INCLUDE_FILE}
     fi
 fi
