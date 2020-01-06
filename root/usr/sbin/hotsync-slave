@@ -73,7 +73,10 @@ fi
 if rpm -q --quiet nethserver-mail-server; then
   chown -R vmail:vmail /var/lib/nethserver/vmail/
   chown root:vmail /var/lib/nethserver/sieve-scripts/
-  chown vmail:vmail /var/lib/nethserver/sieve-scripts/*.svbin
+  COUNT=`/bin/ls -1 /var/lib/nethserver/sieve-scripts/*.svbin 2>/dev/null | /bin/wc -l`
+  if [ $COUNT != 0 ]; then
+    chown vmail:vmail /var/lib/nethserver/sieve-scripts/*.svbin
+  fi
 fi
 
 if rpm -q --quiet nethserver-squidguard; then
