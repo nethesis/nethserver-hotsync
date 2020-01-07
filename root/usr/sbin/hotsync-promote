@@ -28,8 +28,89 @@ if [[ $ROLE != 'slave' ]]; then
     exit 1
 fi
 
+function checkConn() {
+  echo -e "GET http://mirrorlist.nethserver.org HTTP/1.0\n\n" | nc mirrorlist.nethserver.org 80 > /dev/null 2>&1
+  echo $?
+}
+
+function restoreMasterNetwork() {
+  # backup slave network config
+  /bin/mv /var/lib/nethserver/db/networks /var/lib/nethserver/db/networks-slave
+  
+  # overwrite network slave config with master one
+  /bin/tar -xf /var/lib/nethserver/backup/backup-config.tar.xz -C / var/lib/nethserver/db/networks --warning=no-timestamp
+  
+  # overwrite dns configuration
+  /bin/tar -xf /var/lib/nethserver/backup/backup-config.tar.xz -C /var/lib/nethserver/db/ var/lib/nethserver/db/configuration --warning=no-timestamp
+  /bin/mv /var/lib/nethserver/db/var/lib/nethserver/db/configuration /var/lib/nethserver/db/configuration-master
+  /bin/rm -R /var/lib/nethserver/db/var/
+  MASTERDNS=`grep dns= /var/lib/nethserver/db/configuration-master`
+  SLAVEDNS=`grep dns= /var/lib/nethserver/db/configuration`
+  sed -i "s/$SLAVEDNS/$MASTERDNS/g" /var/lib/nethserver/db/configuration
+  
+  # save network config
+  /usr/sbin/e-smith/signal-event nethserver-hosts-save
+  /usr/sbin/e-smith/signal-event interface-update
+  
+  # remove master dns configuration
+  /bin/rm /var/lib/nethserver/db/configuration-master
+}
+
 # launch hotsync-slave to fix permissions before restore
 /usr/sbin/hotsync-slave fixperm
+
+REINSTALL=""
+
+# check internet connection
+if [ $(checkConn) -ne 0 ]; then
+  # internet connection not detected: if packages are already installed and ask user to choose an action
+  echo "No internet connection detected."
+  echo ""
+  echo "1. Restore master network configuration (IMPORTANT: use this option only if two servers are identical - NIC number, names and positions must be identical)"
+  echo "2. Fix network configuration from Cockpit GUI (if you are restoring on different hardware)"
+  echo "3. Continue without internet: assign correct roles before proceed with this option. Some events could fails (not recommended)"
+  echo ""
+  read -p "Please choose an action (1-3): " ACTION
+  
+  case $ACTION in
+  1)
+      $(restoreMasterNetwork)
+      if [ $(checkConn) -ne 0 ]; then
+        echo ""
+        echo "Server not connected. Please check your network configuration."
+        echo "If you want to restore slave network configuration execute these commands:"
+        echo ""
+        echo "   /bin/mv /var/lib/nethserver/db/networks-slave /var/lib/nethserver/db/networks"
+        echo "   /sbin/e-smith/signal-event interface-update"
+        echo ""
+        echo "then check also DNS configuration"
+        ((++exit_code))
+        exit ${exit_code}
+      fi
+      ;;
+  2)
+      # start nethgui to avoid problems on network changes
+      systemctl start httpd-admin.service
+      
+      echo ""
+      echo "Fix network from Cockpit GUI and then relaunch hotsync-promote command."
+      echo "Remember to check: IP addresses, green NIC gateway and DNS"
+      echo ""
+      echo "IMPORTANT: if DC is configured it could be necessary to reconfigure network as master after restore"
+      echo ""
+      ((++exit_code))
+      exit ${exit_code}
+      ;;
+  3)
+      REINSTALL="--no-reinstall"
+      ;;
+  *)
+      echo "Not a valid action"
+      ((++exit_code))
+      exit ${exit_code}
+      ;;
+  esac
+fi
 
 if [[ $DATABASES != 'disabled' ]]; then
   # restore mysql database and restart mysqld service to allow correct applications restore
@@ -40,22 +121,62 @@ if [[ $DATABASES != 'disabled' ]]; then
   
   # restore asterisk mysql database before restore-config to avoid errors
   if rpm -q --quiet nethserver-freepbx; then
-      /usr/bin/mysql < /var/lib/nethserver/backup/mysql/asterisk.dump && /bin/rm /var/lib/nethserver/backup/mysql/asterisk.dump
-      /usr/bin/mysql < /var/lib/nethserver/backup/mysql/asteriskcdrdb.dump && /bin/rm /var/lib/nethserver/backup/mysql/asteriskcdrdb.dump
+      /usr/bin/mysql < /var/lib/nethserver/backup/mysql/asterisk.dump 
+      /usr/bin/mysql < /var/lib/nethserver/backup/mysql/asteriskcdrdb.dump 
   fi
 fi
 
 # Enable NethServer events after yum
 sed -i 's/enabled = 0/enabled = 1/g' /etc/yum/pluginconf.d/nethserver_events.conf
 
-/sbin/e-smith/restore-config
+# launch some events before starting to avoid errors
+echo "[NOTICE] Preparing to restore"
+
+if rpm -q --quiet nethserver-squid; then
+  /usr/sbin/e-smith/signal-event nethserver-squid-update
+fi
+
+if rpm -q --quiet nethserver-freepbx; then
+  systemctl stop asterisk.service
+  systemctl start asterisk.service
+fi
+
+if rpm -q --quiet nethserver-antivirus; then
+  if [ $(checkConn) -eq 0 ]; then
+    # download clamd databases only if there is internet connection
+    /usr/bin/freshclam &> /dev/null
+  fi
+fi
+
+# start config restore
+/sbin/e-smith/restore-config $REINSTALL
 
 if [[ $? == 0 ]]; then
     echo "[NOTICE] Configuration restore completed!"
+    
+    # remove networks-slave db
+    if [[ -e "/var/lib/nethserver/db/networks-slave" ]]; then
+      /bin/rm /var/lib/nethserver/db/networks-slave
+    fi
+    
+    # remove asterisk backups
+    if [[ -e "/var/lib/nethserver/backup/mysql/asterisk.dump" ]]; then
+      /bin/rm /var/lib/nethserver/backup/mysql/asterisk.dump
+    fi
+    
+    if [[ -e "/var/lib/nethserver/backup/mysql/asteriskcdrdb.dump" ]]; then
+      /bin/rm /var/lib/nethserver/backup/mysql/asteriskcdrdb.dump
+    fi
 else
     echo "[ERROR] restore-config failed. Last error messages from /var/log/messages:  "
     echo ""
     grep -E '(ERROR|FAIL)' /var/log/messages | tail -15 | sed 's/^/    /'
+    echo ""
+    # if restore is on different hardware probably will be showed some nsdc errors
+    echo "IMPORTANT: if DC errors are showed go under Network page and configure your network card as master."
+    echo "After that launch: "
+    echo ""
+    echo "   /sbin/e-smith/signal-event nethserver-dc-save"
     echo ""
     ((++exit_code))
 fi
