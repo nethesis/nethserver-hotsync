@@ -196,9 +196,4 @@ else
     ((++exit_code))
 fi
 
-# launch some event after restore-config action
-if rpm -q --quiet nethserver-backup-data; then
-  /usr/sbin/e-smith/signal-event nethserver-backup-data-save
-fi
-
 exit ${exit_code}
