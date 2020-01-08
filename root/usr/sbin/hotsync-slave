@@ -86,4 +86,9 @@ if rpm -q --quiet nethserver-squidguard; then
   chown -R ufdb:ufdb /var/ufdbguard/logs/
 fi
 
+# avoid backup-data execution
+if [[ -e /etc/cron.d/backup-data ]]; then
+  /bin/rm /etc/cron.d/backup-data
+fi
+
 exit ${exit_code}
