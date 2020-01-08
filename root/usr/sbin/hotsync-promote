@@ -142,10 +142,8 @@ if rpm -q --quiet nethserver-freepbx; then
 fi
 
 if rpm -q --quiet nethserver-antivirus; then
-  if [ $(checkConn) -eq 0 ]; then
-    # download clamd databases only if there is internet connection
-    /usr/bin/freshclam &> /dev/null
-  fi
+  # init clamav databases
+  /etc/e-smith/events/actions/nethserver-antivirus-init-avdb
 fi
 
 # start config restore
@@ -177,6 +175,7 @@ else
     echo "After that launch: "
     echo ""
     echo "   /sbin/e-smith/signal-event nethserver-dc-save"
+    echo "   /sbin/e-smith/signal-event nethserver-sssd-save"
     echo ""
     ((++exit_code))
 fi
