@@ -1,6 +1,6 @@
 Summary: NethServer Hotsync 
 Name: nethserver-hotsync
-Version: 2.0.3
+Version: 2.1.0
 Release: 1%{?dist}
 License: GPLv3
 Source0: %{name}-%{version}.tar.gz
@@ -47,6 +47,15 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Wed Jan 08 2020 Federico Ballarini <fed.ballarini@gmail.com> - 2.1.0-1
+- Cockpit: add HotSync interface - NethServer/dev#5996
+- HotSync: freepbx is not restored properly - Bug NethServer/dev#6008
+- HotSync: permissions are not set properly on slave host - Bug NethServer/dev#6009
+- HotSync: nsdc and machines.target status are not synced - Bug NethServer/dev#6011
+- HotSync: avoid logs sync - NethServer/dev#6012
+- HotSync: backup-data shouldn't be executed on slave host - NethServer/dev#6013
+- HotSync: improve promote action - NethServer/dev#6015
+
 * Wed Oct 16 2019 Stefano Fancello <stefano.fancello@nethesis.it> - 2.0.3-1
 - Avoid useless email if scheduled too often
 
