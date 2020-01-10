@@ -56,8 +56,44 @@ function restoreMasterNetwork() {
   /bin/rm /var/lib/nethserver/db/configuration-master
 }
 
+# launch some events before starting to avoid errors
+echo "[NOTICE] Preparing to restore"
+
 # launch hotsync-slave to fix permissions before restore
 /usr/sbin/hotsync-slave fixperm
+
+# init clamav databases
+if rpm -q --quiet nethserver-antivirus; then
+  /etc/e-smith/events/actions/nethserver-antivirus-init-avdb &> /dev/null
+fi
+
+# init defaults databases to avoid errors
+/etc/e-smith/events/actions/initialize-default-databases &> /dev/null
+
+# restart mysqld service to allow correct applications restore
+if rpm -q --quiet nethserver-mysql; then
+    systemctl stop mysqld.service
+    systemctl start mysqld.service
+fi
+
+if [[ $DATABASES != 'disabled' ]]; then  
+  # restore asterisk mysql database before restore-config to avoid errors
+  if rpm -q --quiet nethserver-freepbx; then
+      /usr/bin/mysql < /var/lib/nethserver/backup/mysql/asterisk.dump 
+      /usr/bin/mysql < /var/lib/nethserver/backup/mysql/asteriskcdrdb.dump 
+  fi
+fi
+
+# create squid files
+if rpm -q --quiet nethserver-squid; then
+  /usr/sbin/e-smith/signal-event nethserver-squid-update
+fi
+
+# start asterisk service
+if rpm -q --quiet nethserver-freepbx; then
+  systemctl stop asterisk.service
+  systemctl start asterisk.service
+fi
 
 REINSTALL=""
 
@@ -112,39 +148,8 @@ if [ $(checkConn) -ne 0 ]; then
   esac
 fi
 
-if [[ $DATABASES != 'disabled' ]]; then
-  # restore mysql database and restart mysqld service to allow correct applications restore
-  if rpm -q --quiet nethserver-mysql; then
-      systemctl stop mysqld.service
-      systemctl start mysqld.service
-  fi
-  
-  # restore asterisk mysql database before restore-config to avoid errors
-  if rpm -q --quiet nethserver-freepbx; then
-      /usr/bin/mysql < /var/lib/nethserver/backup/mysql/asterisk.dump 
-      /usr/bin/mysql < /var/lib/nethserver/backup/mysql/asteriskcdrdb.dump 
-  fi
-fi
-
 # Enable NethServer events after yum
 sed -i 's/enabled = 0/enabled = 1/g' /etc/yum/pluginconf.d/nethserver_events.conf
-
-# launch some events before starting to avoid errors
-echo "[NOTICE] Preparing to restore"
-
-if rpm -q --quiet nethserver-squid; then
-  /usr/sbin/e-smith/signal-event nethserver-squid-update
-fi
-
-if rpm -q --quiet nethserver-freepbx; then
-  systemctl stop asterisk.service
-  systemctl start asterisk.service
-fi
-
-if rpm -q --quiet nethserver-antivirus; then
-  # init clamav databases
-  /etc/e-smith/events/actions/nethserver-antivirus-init-avdb
-fi
 
 # start config restore
 /sbin/e-smith/restore-config $REINSTALL
