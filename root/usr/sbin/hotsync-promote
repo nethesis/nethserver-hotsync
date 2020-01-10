@@ -73,11 +73,17 @@ if rpm -q --quiet nethserver-mysql; then
     systemctl start mysqld.service
 fi
 
+# start sssd service
+if rpm -q --quiet nethserver-sssd; then
+    systemctl stop sssd.service
+    systemctl start sssd.service
+fi
+
 if [[ $DATABASES != 'disabled' ]]; then  
   # restore asterisk mysql database before restore-config to avoid errors
   if rpm -q --quiet nethserver-freepbx; then
-      /usr/bin/mysql < /var/lib/nethserver/backup/mysql/asterisk.dump 
-      /usr/bin/mysql < /var/lib/nethserver/backup/mysql/asteriskcdrdb.dump 
+      /usr/bin/mysql < /var/lib/nethserver/backup/mysql/asterisk.dump
+      /usr/bin/mysql < /var/lib/nethserver/backup/mysql/asteriskcdrdb.dump
   fi
 fi
 

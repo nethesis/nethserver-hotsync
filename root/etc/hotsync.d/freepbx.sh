@@ -32,9 +32,9 @@ if rpm -q --quiet nethserver-freepbx; then
     echo "/var/lib/asterisk/" >> ${INCLUDE_FILE}
     echo "/var/www/html/freepbx/" >> ${INCLUDE_FILE}
     echo "/etc/amportal.conf" >> ${INCLUDE_FILE}
-    echo "/etc/asterisk/asterisk.conf" >> ${INCLUDE_FILE}
-    echo "/etc/asterisk/manager.conf" >> ${INCLUDE_FILE}
     echo "/etc/freepbx.conf" >> ${INCLUDE_FILE}
+    echo "/etc/freepbx_db.conf" >> ${INCLUDE_FILE}
+    echo "/etc/asterisk/" >> ${INCLUDE_FILE}
     echo "/usr/sbin/fwconsole" >> ${INCLUDE_FILE}
     
     # remove excluded freepbx files
