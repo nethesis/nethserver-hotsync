@@ -1,6 +1,6 @@
 Summary: NethServer Hotsync 
 Name: nethserver-hotsync
-Version: 2.1.0
+Version: 2.1.1
 Release: 1%{?dist}
 License: GPLv3
 Source0: %{name}-%{version}.tar.gz
@@ -47,6 +47,9 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Fri Jan 10 2020 Federico Ballarini <fed.ballarini@gmail.com> - 2.1.1-1
+- HotSync: missing db and files cause errors - Bug NethServer/dev#6010
+
 * Wed Jan 08 2020 Federico Ballarini <fed.ballarini@gmail.com> - 2.1.0-1
 - Cockpit: add HotSync interface - NethServer/dev#5996
 - HotSync: freepbx is not restored properly - Bug NethServer/dev#6008
