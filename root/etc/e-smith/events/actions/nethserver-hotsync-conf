@@ -34,6 +34,19 @@ if ($role eq 'slave') {
   #configuring slave
   #disable yum nethserver plugin
   system("sed","-i", 's/enabled = 1/enabled = 0/g',"/etc/yum/pluginconf.d/nethserver_events.conf");
+  #create vpn db to avoid errors
+  if (not -e "/var/lib/nethserver/db/vpn") {
+    #check openvpn
+    my @cmdResults = `rpm -qa nethserver-openvpn`;
+    if (@cmdResults) {
+      system("/sbin/e-smith/signal-event nethserver-openvpn-update");
+    }
+    #check ipsec
+    @cmdResults = `rpm -qa nethserver-ipsec-tunnels`;
+    if (@cmdResults) {
+      system("/sbin/e-smith/signal-event nethserver-ipsec-tunnels-update");
+    }
+  }
   #disable backup config
   if ($conf->get_prop('backup-config', 'status') eq 'enabled'){
     $conf->set_prop('backup-config', 'status', 'disabled');
