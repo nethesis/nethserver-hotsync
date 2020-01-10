@@ -67,9 +67,6 @@ if rpm -q --quiet nethserver-antivirus; then
   /etc/e-smith/events/actions/nethserver-antivirus-init-avdb &> /dev/null
 fi
 
-# init defaults databases to avoid errors
-/etc/e-smith/events/actions/initialize-default-databases &> /dev/null
-
 # restart mysqld service to allow correct applications restore
 if rpm -q --quiet nethserver-mysql; then
     systemctl stop mysqld.service
@@ -94,6 +91,9 @@ if rpm -q --quiet nethserver-freepbx; then
   systemctl stop asterisk.service
   systemctl start asterisk.service
 fi
+
+# init defaults databases to avoid errors
+/etc/e-smith/events/actions/initialize-default-databases &> /dev/null
 
 REINSTALL=""
 
