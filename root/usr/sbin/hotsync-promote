@@ -79,6 +79,11 @@ if [[ $DATABASES != 'disabled' ]]; then
       /usr/bin/mysql < /var/lib/nethserver/backup/mysql/asterisk.dump
       /usr/bin/mysql < /var/lib/nethserver/backup/mysql/asteriskcdrdb.dump
   fi
+  
+  # restore nextcloud mysql database
+  if rpm -q --quiet nethserver-nextcloud; then
+      /usr/bin/mysql < /var/lib/nethserver/backup/mysql/nextcloud.dump
+  fi
 fi
 
 # create squid files
