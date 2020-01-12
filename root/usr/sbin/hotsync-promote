@@ -175,6 +175,11 @@ if [[ $? == 0 ]]; then
     if [[ -e "/var/lib/nethserver/backup/mysql/asteriskcdrdb.dump" ]]; then
       /bin/rm /var/lib/nethserver/backup/mysql/asteriskcdrdb.dump
     fi
+    
+    # remove nextcloud backup
+    if [[ -e "/var/lib/nethserver/backup/mysql/nextcloud.dump" ]]; then
+      /bin/rm /var/lib/nethserver/backup/mysql/nextcloud.dump
+    fi
 else
     echo "[ERROR] restore-config failed. Last error messages from /var/log/messages:  "
     echo ""
