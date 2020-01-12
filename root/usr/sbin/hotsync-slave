@@ -89,7 +89,7 @@ if rpm -q --quiet nethserver-squidguard; then
   chown -R ufdb:ufdb /var/ufdbguard/logs/
 fi
 
-if rpm -q --quiet nethserver-pulledpork; then
+if rpm -q --quiet nethserver-suricata; then
   chown -R suricata:suricata /etc/suricata/
 fi
 
