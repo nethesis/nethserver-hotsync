@@ -98,4 +98,21 @@ if [[ -e /etc/cron.d/backup-data ]]; then
   /bin/rm /etc/cron.d/backup-data
 fi
 
+# avoid cron execution
+if [[ -e /etc/cron.d/dante ]]; then
+  /bin/rm /etc/cron.d/dante
+fi
+
+if [[ -e /etc/cron.d/queuereport ]]; then
+  /bin/rm /etc/cron.d/queuereport
+fi
+
+if [[ -e /etc/cron.daily/lightsquid ]]; then
+  /bin/rm /etc/cron.daily/lightsquid
+fi
+
+if [[ -e /etc/cron.daily/pulledpork ]]; then
+  /bin/rm /etc/cron.daily/pulledpork
+fi
+
 exit ${exit_code}
