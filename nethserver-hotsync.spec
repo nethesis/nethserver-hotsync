@@ -1,6 +1,6 @@
 Summary: NethServer Hotsync 
 Name: nethserver-hotsync
-Version: 2.1.2
+Version: 2.1.3
 Release: 1%{?dist}
 License: GPLv3
 Source0: %{name}-%{version}.tar.gz
@@ -47,6 +47,10 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Sun Jan 12 2020 Federico Ballarini <fed.ballarini@gmail.com> - 2.1.3-1
+- HotSync: add logs view - NethServer/dev#6027
+- Avoid to restore nextcloud twice
+
 * Sun Jan 12 2020 Federico Ballarini <fed.ballarini@gmail.com> - 2.1.2-1
 - HotSync: suricata permissions are not set properly - Bug NethServer/dev#6024
 - HotSync: nextcloud is not restored properly - Bug NethServer/dev#6025
