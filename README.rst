@@ -5,13 +5,17 @@ nethserver-hotsync
 What is it ?
 ============
 
-NethServer HotSync aims to reduce downtime in case of failure. Normally, when an hardware damage occurs, the time needed to restore service is:
+HotSync aims to reduce downtime in case of failure, syncing your NethServer with another one, that will be manually activated in case of master server failure.
+
+Normally, when a hardware damage occurs, the time needed to restore service is:
 
 * fix or buy another server: from 4h to 2 days
 * install the OS: 30 minutes
 * restore backup: from 10 minutes to 8 hours
 
-In summary, users are able to start working again with data from the night before failure after a few hours or days. Using HotSync, time 1 and 3 become 0 and 2 becomes 5 minutes (time to activate the slave server). Users are able to start working again in few minutes, using data from a few minutes before the crash.
+In summary, users are able to start working again with data from the night before failure after a few hours/days. Using HotSync, time 1 and 3 are 0, 2 is 5 minutes (time to activate spare server). Users are able to start working again in few minutes, using data from a few minutes before the crash.
+
+By default all data included in backup are synchronized every 15 minutes. MariaDB databases are synchronized too, unless databases synchronization isn’t disabled. Applications that use PostgreSQL are synchronized (Mattermost, Webtop5) unless databases synchronization isn’t disabled.
 
 Requirements
 ============
@@ -20,6 +24,8 @@ Two server machines are needed:
 
 * MASTER: active server on production
 * SLAVE: warm backup server
+
+For a correct restore, it’s suggested to configure HotSync on two identical servers or two servers with same network cards number, name and position. If the master and slave servers differ, the restore procedure may behave unexpectedly (see Troubleshooting section on NethServer docs).
 
 How it works
 ============
@@ -31,7 +37,7 @@ Installation
 
 On both MASTER and SLAVE, install nethserver-hotsync: ::
 
-    # yum install nethserver-hotsync
+    # yum install nethserver-hotsync --enablerepo=nethforge
 
 Configuration
 =============
@@ -57,6 +63,8 @@ If *MySQL* or *PostgreSQL* are installed, they will be synchronized by default. 
     [root@master]# config setprop hotsync databases disabled
     [root@master]# signal-event nethserver-hotsync-save
 
+You can update these settings also from Cockpit interface.
+
 How to restore
 ==============
 
@@ -71,8 +79,14 @@ The following procedure puts the SLAVE in production when the master has crashed
 4. on SLAVE launch command, and read carefully its output ::
 
     [root@slave]# hotsync-promote
+   
+   If no Internet connection is detected (e.g. you are restoring a firewall on a machine that was passing through crashed master for Internet connection), the scripts will purpose you some options:
 
-5. go to Server Manager page ``Network`` and reassign roles to network interfaces if required
+    1. Restore master network configuration (IMPORTANT: use this option only if two servers are identical - NIC number, names and positions must be identical)
+    2. Fix network configuration from Cockpit GUI (when restoring on different hardware)
+    3. Continue without internet: assign correct roles before proceed with this option. Some events could fails (not recommended)
+
+5. If necessary go to Server Manager or Cockpit GUI, in page Network and reassign roles to network interfaces as master one. Remember also to recreate bridge if you have configured DC. In case of DC errors consult troubleshooting section before proceed with network restore.
 6. launch command ::
 
     [root@slave]# /sbin/e-smith/signal-event post-restore-data
@@ -91,7 +105,7 @@ To put again in production original crashed server:
 
        # hotsync-slave
 
-5. restore configuration backup
+5. restore configuration backup following above instructions
 
 
 How to synchronize custom paths
@@ -146,47 +160,57 @@ configuration backup the list of packages to install and install them.
 Supported packages
 ==================
 
-- nethserver-nextcloud
-- nethserver-mysql
-- nethserver-dnsmasq
-- nethserver-squidguard
-- nethserver-pulledpork
-- nethserver-antivirus
-- nethserver-samba-audit
-- nethserver-freepbx > 14.0.3
-- nethserver-webtop5 (z-push state is not synchronized)
-- nethserver-collectd
-- nethserver-cups
-- nethserver-dc
-- nethserver-letsencrypt
-- nethserver-nextcloud
-- nethserver-sssd
-- nethserver-directory
-- nethserver-ibays
-- nethserver-mail-server
+* nethserver-antivirus
+* nethserver-backup-config
+* nethserver-backup-data
+* nethserver-base
+* nethserver-c-icap
+* nethserver-cockpit
+* nethserver-collectd
+* nethserver-cups
+* nethserver-dante
+* nethserver-dc
+* nethserver-dedalo
+* nethserver-directory
+* nethserver-dnsmasq
+* nethserver-duc
+* nethserver-ejabberd
+* nethserver-evebox
+* nethserver-fail2ban
+* nethserver-firewall-base
+* nethserver-freepbx > 14.0.3
+* nethserver-httpd
+* nethserver-hylafax
+* nethserver-iaxmodem
+* nethserver-ipsec-tunnels
+* nethserver-janus
+* nethserver-letsencrypt
+* nethserver-lightsquid
+* nethserver-mail
+* nethserver-mattermost
+* nethserver-mysql
+* nethserver-ndpi
+* nethserver-netdata
+* nethserver-nextcloud
+* nethserver-ntopng
+* nethserver-nut
+* nethserver-openssh
+* nethserver-openvpn
+* nethserver-pulledpork
+* nethserver-restore-data
+* nethserver-roundcubemail
+* nethserver-samba
+* nethserver-samba-audit
+* nethserver-squid
+* nethserver-squidclamav
+* nethserver-squidguard
+* nethserver-sssd
+* nethserver-subscription
+* nethserver-suricata
+* nethserver-vpn-ui
+* nethserver-vsftpd
+* nethserver-webtop5 (z-push state is not synchronized)
 
-Unsupported packages
-====================
+Packages nethserver-ntopng and nethserver-evebox are reinstalled without migrating history.
 
-- nethserver-evebox
-- nethserver-getmail
-- nethserver-ntopng
-
-
-HotSync management using Cockpit Graphical Interface
-====================================================
-
-It can be possible to administrate HotSync from cockpit web graphical interface installing `nethserver-cockpit-hotsync`.
-
-
-Configuration using Cockpit Web Gui
------------------------------------
-
-- On both MASTER and SLAVE browse to cockpit web gui -> "Applications" -> "NethServer Hotsync" -> "Settings"
-- select the "role", then insert the requested data and click "Save" button
-
-Restore using Cockpit Web Gui
------------------------------
-
-- From SLAVE browse to cockpit web gui -> "Applications" -> "NethServer Hotsync" -> "Settings"
-- click on "Promote to Master" button
+Please read the docs before proceed with restore.
