@@ -1,6 +1,6 @@
 Summary: NethServer Hotsync 
 Name: nethserver-hotsync
-Version: 2.1.3
+Version: 2.1.4
 Release: 1%{?dist}
 License: GPLv3
 Source0: %{name}-%{version}.tar.gz
@@ -47,6 +47,10 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Sat Feb 8 2020 Federico Ballarini <fed.ballarini@gmail.com> - 2.1.4-1
+- HotSync: hide rsyncd password field - NethServer/dev#6054
+- HotSync: getmail status is not synced - Bug NethServer/dev#6055
+
 * Sun Jan 12 2020 Federico Ballarini <fed.ballarini@gmail.com> - 2.1.3-1
 - HotSync: add logs view - NethServer/dev#6027
 - Avoid to restore nextcloud twice
