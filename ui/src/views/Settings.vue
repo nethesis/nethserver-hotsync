@@ -70,7 +70,7 @@
                     <input
                       tabindex="0"
                       class="form-control"
-                      :type="configuration.togglePass ? 'text' : 'password'"
+                      :type="togglePass ? 'text' : 'password'"
                       v-model="configuration.rsyncdPassword"
                       required
                     >
@@ -78,11 +78,11 @@
                   <div class="col-sm-2">
                     <button
                       tabindex="-1"
-                      @click="togglePass()"
+                      @click="togglePassword()"
                       type="button"
                       class="btn btn-primary adjust-top-min"
                     >
-                      <span :class="[!configuration.togglePass ? 'fa fa-eye' : 'fa fa-eye-slash']"></span>
+                      <span :class="[!togglePass ? 'fa fa-eye' : 'fa fa-eye-slash']"></span>
                     </button>
                   </div>
                 </div>
@@ -125,7 +125,7 @@
                     <input
                       tabindex="0"
                       class="form-control"
-                      :type="configuration.togglePass ? 'text' : 'password'"
+                      :type="togglePass ? 'text' : 'password'"
                       v-model="configuration.rsyncdPassword"
                       required
                     >
@@ -133,11 +133,11 @@
                   <div class="col-sm-2">
                     <button
                       tabindex="-1"
-                      @click="togglePass()"
+                      @click="togglePassword()"
                       type="button"
                       class="btn btn-primary adjust-top-min"
                     >
-                      <span :class="[!configuration.togglePass ? 'fa fa-eye' : 'fa fa-eye-slash']"></span>
+                      <span :class="[!togglePass ? 'fa fa-eye' : 'fa fa-eye-slash']"></span>
                     </button>
                   </div>
                 </div>
@@ -255,15 +255,15 @@ export default {
         masterIp: null,
         slaveIp: null,
         databases: null,
-        rsyncdPassword: null,
-        togglePass: false
+        rsyncdPassword: null
       },
       status: {
         runningMaster: false,
         runningSlave: false
       },
       loaders: false,
-      errors: this.initErrors()
+      errors: this.initErrors(),
+      togglePass: false
     }
   },
   methods: {
@@ -420,8 +420,8 @@ export default {
         context.getHotsyncStatus();
       }, 2500);
     },
-    togglePass() {
-      this.configuration.togglePass = !this.configuration.togglePass;
+    togglePassword() {
+      this.togglePass = !this.togglePass;
     }
   }
 };
