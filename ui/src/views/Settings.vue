@@ -112,11 +112,23 @@
                   </label>
                   <div class="col-sm-5">
                     <input
+                      tabindex="0"
                       type="text"
                       class="form-control"
+                      :type="configuration.togglePass ? 'text' : 'password'"
                       v-model="configuration.rsyncdPassword"
                       required
                     >
+                  </div>
+                  <div class="col-sm-2">
+                    <button
+                      tabindex="-1"
+                      @click="togglePass()"
+                      type="button"
+                      class="btn btn-primary adjust-top-min"
+                    >
+                      <span :class="[!configuration.togglePass ? 'fa fa-eye' : 'fa fa-eye-slash']"></span>
+                    </button>
                   </div>
                 </div>
                 <div :class="['form-group', errors.masterIp.hasError ? 'has-error' : '']">
@@ -233,7 +245,8 @@ export default {
         masterIp: null,
         slaveIp: null,
         databases: null,
-        rsyncdPassword: null
+        rsyncdPassword: null,
+        togglePass: false
       },
       status: {
         runningMaster: false,
@@ -396,6 +409,9 @@ export default {
       context.pollingIntervalId = setInterval(function() {
         context.getHotsyncStatus();
       }, 2500);
+    },
+    togglePass() {
+      this.configuration.togglePass = !this.configuration.togglePass;
     }
   }
 };
