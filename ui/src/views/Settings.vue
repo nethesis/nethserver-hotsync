@@ -68,11 +68,22 @@
                   </label>
                   <div class="col-sm-5">
                     <input
-                      type="text"
+                      tabindex="0"
                       class="form-control"
+                      :type="configuration.togglePass ? 'text' : 'password'"
                       v-model="configuration.rsyncdPassword"
                       required
                     >
+                  </div>
+                  <div class="col-sm-2">
+                    <button
+                      tabindex="-1"
+                      @click="togglePass()"
+                      type="button"
+                      class="btn btn-primary adjust-top-min"
+                    >
+                      <span :class="[!configuration.togglePass ? 'fa fa-eye' : 'fa fa-eye-slash']"></span>
+                    </button>
                   </div>
                 </div>
                 <div :class="['form-group', errors.slaveIp.hasError ? 'has-error' : '']">
@@ -113,7 +124,6 @@
                   <div class="col-sm-5">
                     <input
                       tabindex="0"
-                      type="text"
                       class="form-control"
                       :type="configuration.togglePass ? 'text' : 'password'"
                       v-model="configuration.rsyncdPassword"
