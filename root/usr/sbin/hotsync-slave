@@ -111,19 +111,19 @@ if [[ -e /etc/cron.d/queuereport ]]; then
   /bin/rm /etc/cron.d/queuereport
 fi
 
-if [[ -d "/etc/cron.hourly" ]]; then
+if [[ -d "/etc/cron.hourly" ]] && [ "$(ls -A /etc/cron.hourly)" ]; then
   /bin/chmod -x /etc/cron.hourly/*
 fi
 
-if [[ -d "/etc/cron.daily" ]]; then
+if [[ -d "/etc/cron.daily" ]] && [ "$(ls -A /etc/cron.daily)" ]; then
   /bin/chmod -x /etc/cron.daily/*
 fi
 
-if [[ -d "/etc/cron.weekly" ]]; then
+if [[ -d "/etc/cron.weekly" ]] && [ "$(ls -A /etc/cron.weekly)" ]; then
   /bin/chmod -x /etc/cron.weekly/*
 fi
 
-if [[ -d "/etc/cron.monthly" ]]; then
+if [[ -d "/etc/cron.monthly" ]] && [ "$(ls -A /etc/cron.monthly)" ]; then
   /bin/chmod -x /etc/cron.monthly/*
 fi
 
