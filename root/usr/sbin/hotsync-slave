@@ -48,6 +48,36 @@ if [[ "$1" != "fixperm" ]]; then
     fi
 fi
 
+# avoid backup-data execution
+if [[ -e /etc/cron.d/backup-data ]]; then
+  /bin/rm /etc/cron.d/backup-data
+fi
+
+# avoid cron execution
+if [[ -e /etc/cron.d/dante ]]; then
+  /bin/rm /etc/cron.d/dante
+fi
+
+if [[ -e /etc/cron.d/queuereport ]]; then
+  /bin/rm /etc/cron.d/queuereport
+fi
+
+if [[ -d "/etc/cron.hourly" ]] && [ "$(ls -A /etc/cron.hourly)" ]; then
+  /bin/chmod -x /etc/cron.hourly/*
+fi
+
+if [[ -d "/etc/cron.daily" ]] && [ "$(ls -A /etc/cron.daily)" ]; then
+  /bin/chmod -x /etc/cron.daily/*
+fi
+
+if [[ -d "/etc/cron.weekly" ]] && [ "$(ls -A /etc/cron.weekly)" ]; then
+  /bin/chmod -x /etc/cron.weekly/*
+fi
+
+if [[ -d "/etc/cron.monthly" ]] && [ "$(ls -A /etc/cron.monthly)" ]; then
+  /bin/chmod -x /etc/cron.monthly/*
+fi
+
 # fix permissions
 if rpm -q --quiet nethserver-freepbx; then
   chown asterisk:asterisk /etc/freepbx.conf
@@ -95,36 +125,6 @@ fi
 
 if rpm -q --quiet nethserver-mail-getmail; then
   chown vmail:vmail /var/lib/getmail/
-fi
-
-# avoid backup-data execution
-if [[ -e /etc/cron.d/backup-data ]]; then
-  /bin/rm /etc/cron.d/backup-data
-fi
-
-# avoid cron execution
-if [[ -e /etc/cron.d/dante ]]; then
-  /bin/rm /etc/cron.d/dante
-fi
-
-if [[ -e /etc/cron.d/queuereport ]]; then
-  /bin/rm /etc/cron.d/queuereport
-fi
-
-if [[ -d "/etc/cron.hourly" ]] && [ "$(ls -A /etc/cron.hourly)" ]; then
-  /bin/chmod -x /etc/cron.hourly/*
-fi
-
-if [[ -d "/etc/cron.daily" ]] && [ "$(ls -A /etc/cron.daily)" ]; then
-  /bin/chmod -x /etc/cron.daily/*
-fi
-
-if [[ -d "/etc/cron.weekly" ]] && [ "$(ls -A /etc/cron.weekly)" ]; then
-  /bin/chmod -x /etc/cron.weekly/*
-fi
-
-if [[ -d "/etc/cron.monthly" ]] && [ "$(ls -A /etc/cron.monthly)" ]; then
-  /bin/chmod -x /etc/cron.monthly/*
 fi
 
 exit ${exit_code}

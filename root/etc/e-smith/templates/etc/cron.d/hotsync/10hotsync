@@ -7,12 +7,12 @@
     {
         if ( $hotsync{status} eq 'enabled' )
         {
-            $OUT="#HotSync Master\n0,15,30,45 * * * * root /usr/sbin/hotsync > /dev/null";
+            $OUT="#HotSync Master\n5,20,35,50 * * * * root /usr/sbin/hotsync > /dev/null";
         } else {
             $OUT="#HotSync Master - status disabled";
         }
     } elsif ( $hotsync{role} eq 'slave') {
-        $OUT="#HotSync Slave\n0 1 * * * root /usr/sbin/hotsync-slave > /dev/null";
+        $OUT="#HotSync Slave\n0 1 * * * root /usr/sbin/hotsync-slave > /dev/null\n0,15,30,45 * * * * root /usr/sbin/hotsync-slave fixperm > /dev/null";
     } else {
         $OUT="#HotSync disabled - Unknow role";
     }
