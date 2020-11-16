@@ -100,6 +100,24 @@ fi
 # init defaults databases to avoid errors
 /etc/e-smith/events/actions/initialize-default-databases &> /dev/null
 
+# set execution on cron files
+if [[ -d "/etc/cron.hourly" ]]; then
+  /bin/chmod +x /etc/cron.hourly/*
+  /bin/chmod -x /etc/cron.hourly/jobs.deny
+fi
+
+if [[ -d "/etc/cron.daily" ]]; then
+  /bin/chmod +x /etc/cron.daily/*
+fi
+
+if [[ -d "/etc/cron.weekly" ]]; then
+  /bin/chmod +x /etc/cron.weekly/*
+fi
+
+if [[ -d "/etc/cron.monthly" ]]; then
+  /bin/chmod +x /etc/cron.monthly/*
+fi
+
 REINSTALL=""
 
 # check internet connection

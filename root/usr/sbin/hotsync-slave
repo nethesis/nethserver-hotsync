@@ -111,12 +111,20 @@ if [[ -e /etc/cron.d/queuereport ]]; then
   /bin/rm /etc/cron.d/queuereport
 fi
 
-if [[ -e /etc/cron.daily/lightsquid ]]; then
-  /bin/rm /etc/cron.daily/lightsquid
+if [[ -d "/etc/cron.hourly" ]] && [ "$(ls -A /etc/cron.hourly)" ]; then
+  /bin/chmod -x /etc/cron.hourly/*
 fi
 
-if [[ -e /etc/cron.daily/pulledpork ]]; then
-  /bin/rm /etc/cron.daily/pulledpork
+if [[ -d "/etc/cron.daily" ]] && [ "$(ls -A /etc/cron.daily)" ]; then
+  /bin/chmod -x /etc/cron.daily/*
+fi
+
+if [[ -d "/etc/cron.weekly" ]] && [ "$(ls -A /etc/cron.weekly)" ]; then
+  /bin/chmod -x /etc/cron.weekly/*
+fi
+
+if [[ -d "/etc/cron.monthly" ]] && [ "$(ls -A /etc/cron.monthly)" ]; then
+  /bin/chmod -x /etc/cron.monthly/*
 fi
 
 exit ${exit_code}
