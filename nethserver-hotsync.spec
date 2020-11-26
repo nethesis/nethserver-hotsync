@@ -1,6 +1,6 @@
 Summary: NethServer Hotsync 
 Name: nethserver-hotsync
-Version: 2.1.4
+Version: 2.2.0
 Release: 1%{?dist}
 License: GPLv3
 Source0: %{name}-%{version}.tar.gz
@@ -47,6 +47,10 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Thu Nov 26 2020 Federico Ballarini <fed.ballarini@gmail.com> - 2.2.0-1
+- HotSync: cron sync and avoid execution on slave host - Bug NethServer/dev#6328
+- HotSync: permissions are not fixed after master sync - Bug NethServer/dev#6335
+
 * Sat Feb 8 2020 Federico Ballarini <fed.ballarini@gmail.com> - 2.1.4-1
 - HotSync: hide rsyncd password field - NethServer/dev#6054
 - HotSync: getmail status is not synced - Bug NethServer/dev#6055
