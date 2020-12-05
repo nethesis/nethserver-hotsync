@@ -115,7 +115,12 @@ fi
 if rpm -q --quiet nethserver-squidguard; then
   chown -R squid:squid /var/squidGuard/blacklists/
   chown -R ufdb:squid /var/squidGuard/blacklists/cache.execlists/
-  chown -R ufdb:ufdb /var/ufdbguard/blacklists/
+  
+  if [[ -d "/var/squidGuard/blacklists.old/" ]]; then
+    chown -R squid:squid /var/squidGuard/blacklists.old/
+    chown -R ufdb:squid /var/squidGuard/blacklists.old/cache.execlists/
+  fi
+  
   chown -R ufdb:ufdb /var/ufdbguard/logs/
 fi
 
