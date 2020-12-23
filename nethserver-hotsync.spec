@@ -13,6 +13,11 @@ BuildRequires: nethserver-devtools
 %description
 NethServer Hotsync is a tool that simplifies configuration of rsync to keep two NethServer up to date
 
+%pre
+# ensure srvmgr user exists:
+if ! id srvmgr >/dev/null 2>&1 ; then
+   useradd -r -U -G adm srvmgr
+fi
 
 %prep
 %setup -q
