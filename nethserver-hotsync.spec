@@ -1,6 +1,6 @@
 Summary: NethServer Hotsync 
 Name: nethserver-hotsync
-Version: 2.2.1
+Version: 2.2.2
 Release: 1%{?dist}
 License: GPLv3
 Source0: %{name}-%{version}.tar.gz
@@ -52,6 +52,9 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Fri Dec 25 2020 Federico Ballarini <fed.ballarini@gmail.com> - 2.2.2-1
+- Missing srvmgr user prevents OpenVPN file upload and cause wrong backup config history file owner - Bug NethServer/dev#6375
+
 * Sat Dec 05 2020 Federico Ballarini <fed.ballarini@gmail.com> - 2.2.1-1
 - HotSync: ufdbGuard error while fixing permissions - Bug NethServer/dev#6355
 
