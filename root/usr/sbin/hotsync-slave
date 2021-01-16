@@ -121,7 +121,9 @@ if rpm -q --quiet nethserver-squidguard; then
     chown -R ufdb:squid /var/squidGuard/blacklists.old/cache.execlists/
   fi
   
-  chown -R ufdb:ufdb /var/ufdbguard/logs/
+  if [[ -d "/var/ufdbguard/logs/" ]]; then
+    chown -R ufdb:ufdb /var/ufdbguard/logs/
+  fi
 fi
 
 if rpm -q --quiet nethserver-suricata; then
