@@ -31,7 +31,7 @@ EXCLUDE_FILE=$2
 if rpm -q --quiet nethserver-mattermost; then
     # check if postgresql rsync is enabled
     if [[ $DATABASES != 'disabled' ]]; then
-	/usr/bin/su - postgres -c "scl enable rh-postgresql94 -- pg_dump --port 55432 mattermost > /var/lib/nethserver/mattermost/backup/mattermost.sql"
+	/usr/bin/su - postgres -c "scl enable rh-postgresql12 -- pg_dump --port 55434 mattermost > /var/lib/nethserver/mattermost/backup/mattermost.sql"
         echo "/var/lib/nethserver/mattermost/backup/mattermost.sql" >> ${INCLUDE_FILE}
     fi
 fi
