@@ -1,6 +1,6 @@
 Summary: NethServer Hotsync 
 Name: nethserver-hotsync
-Version: 2.2.3
+Version: 2.2.4
 Release: 1%{?dist}
 License: GPLv3
 Source0: %{name}-%{version}.tar.gz
@@ -52,6 +52,9 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Mon Jan 18 2021 Federico Ballarini <fed.ballarini@gmail.com> - 2.2.4-1
+- HotSync: wrong Mattermost sql dump - Bug NethServer/dev#6397
+
 * Sat Jan 16 2021 Federico Ballarini <fed.ballarini@gmail.com> - 2.2.3-1
 - HotSync: errors while applying permissions on ufdbGuard folder - Bug NethServer/dev#6396
 
